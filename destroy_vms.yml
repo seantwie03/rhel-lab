@@ -1,0 +1,145 @@
+- name: Destroy virtual machines for RHEL lab environment (not idempotent)
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars_files:
+    - vars/rhel_lab_vars.yml
+
+  tasks:
+    - name: Destroy graphical workstations
+      block:
+        - name: Shutdown the graphical workstation virtual machines
+          community.libvirt.virt:
+            name: "{{ item.hostname }}"
+            command: shutdown
+          failed_when: false
+          loop: "{{ graphical_workstations }}"
+
+        - name: Undefine the graphical workstation virtual machines
+          community.libvirt.virt:
+            name: "{{ item.hostname }}"
+            command: undefine
+            force: true
+          loop: "{{ graphical_workstations }}"
+
+        - name: Find all storage drives for graphical workstations
+          ansible.builtin.find:
+            paths: /var/lib/libvirt/images/
+            patterns: "{{ item.hostname }}*"
+          register: found_workstation_drives
+          loop: "{{ graphical_workstations }}"
+
+        - name: Print found workstation drives
+          ansible.builtin.debug:
+            msg: "Found drives: {{ item.files }}"
+            verbosity: 1
+          loop: "{{ found_workstation_drives.results }}"
+          loop_control:
+            label: "{{ item.files | map(attribute='path') }}"
+
+        - name: Destroy all storage drives for graphical workstations
+          ansible.builtin.file:
+            path: "{{ item.path }}"
+            state: absent
+          loop: "{{ found_workstation_drives.results | map(attribute='files') | sum(start=[]) }}"
+
+    - name: Destroy headless servers
+      block:
+        - name: Shutdown the headless server virtual machines
+          community.libvirt.virt:
+            name: "{{ item.hostname }}"
+            command: shutdown
+          failed_when: false
+          loop: "{{ headless_servers }}"
+
+        - name: Undefine the headless server virtual machines
+          community.libvirt.virt:
+            name: "{{ item.hostname }}"
+            command: undefine
+            force: true
+          loop: "{{ headless_servers }}"
+
+        - name: Find all storage drives for headless servers
+          ansible.builtin.find:
+            paths: /var/lib/libvirt/images/
+            patterns: "{{ item.hostname }}*.qcow2"
+          register: found_server_drives
+          loop: "{{ headless_servers }}"
+
+        - name: Print found server drives
+          ansible.builtin.debug:
+            msg: "Found drives: {{ item.files }}"
+            verbosity: 1
+          loop: "{{ found_server_drives.results }}"
+          loop_control:
+            label: "{{ item.files | map(attribute='path') }}"
+
+        - name: Destroy all storage drives for headless servers
+          ansible.builtin.file:
+            path: "{{ item.path }}"
+            state: absent
+          loop: "{{ found_server_drives.results | map(attribute='files') | sum(start=[]) }}"
+
+    - name: Remove lab-example-com network
+      block:
+        - name: Remove lab-example-com network
+          community.libvirt.virt_net:
+            state: absent
+            name: lab-example-com
+
+    - name: Remove kickstarts directory
+      block:
+        - name: Remove kickstarts directory
+          ansible.builtin.file:
+            path: /var/lib/libvirt/kickstarts
+            state: absent
+
+    - name: Remove host config
+      block:
+        - name: Remove headless servers from hosts file
+          ansible.builtin.lineinfile:
+            path: /etc/hosts
+            regexp: ^{{ item.ip }}|\s{{ item.hostname }}
+            state: absent
+          loop: "{{ headless_servers }}"
+
+        - name: Remove graphical workstations from hosts file
+          ansible.builtin.lineinfile:
+            path: /etc/hosts
+            regexp: ^{{ item.ip }}|\s{{ item.hostname }}
+            state: absent
+          loop: "{{ graphical_workstations }}"
+
+        - name: Remove rhel lab key
+          ansible.builtin.file:
+            dest: "/home/{{ user_name }}/.ssh/rhel_lab_key"
+            state: absent
+
+        - name: Remove SSH config for headless servers
+          ansible.builtin.blockinfile:
+            path: "/home/{{ user_name }}/.ssh/config"
+            state: absent
+            marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
+          loop: "{{ headless_servers }}"
+
+        - name: Remove SSH config for root access to headless servers
+          ansible.builtin.blockinfile:
+            path: "/home/{{ user_name }}/.ssh/config"
+            state: absent
+            marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
+          loop: "{{ headless_servers }}"
+
+        - name: Remove SSH config for graphical workstations
+          ansible.builtin.blockinfile:
+            path: "/home/{{ user_name }}/.ssh/config"
+            state: absent
+            marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
+          loop: "{{ graphical_workstations }}"
+
+        - name: Remove SSH config for root access to graphical workstations
+          ansible.builtin.blockinfile:
+            path: "/home/{{ user_name }}/.ssh/config"
+            state: absent
+            marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
+          loop: "{{ headless_servers }}"
