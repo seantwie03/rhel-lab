@@ -1,4 +1,4 @@
-# RHCSA
+# Red Hat Enterprise Linux (RHEL) Lab Environment
 
 This repo contains playbooks to install and setup several Virtual Machines that can be used to study for Red Hat exams. These playbooks have been tested on Fedora but will likely work on any Enterprise Linux distribution.
 
