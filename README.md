@@ -6,6 +6,10 @@ This repo contains playbooks to install and setup several Virtual Machines that 
 
 This lab environment is loosely based off of the [Red Hat Academy](https://www.redhat.com/en/services/training/red-hat-academy) lab environment for the [RHCSA](https://www.redhat.com/en/services/certification/rhcsa) and [RHCE](https://www.redhat.com/en/services/certification/rhce) courses.
 
+**Hypervisor**: Libvirt
+
+**VM Configuration**: [kickstart](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/automatically_installing_rhel/automated-installation-workflow)
+
 **Network**: 172.25.250.0/24
 
 | Name        | IP              | System Type | CPU | Memory (MB) | Disks (this provisioned)                |
@@ -15,13 +19,16 @@ This lab environment is loosely based off of the [Red Hat Academy](https://www.r
 | serverb     | 172.25.250.11   | Headless    | 1   | 2048        | 1 × 10GB (OS), 3 × 5GB (blank)          |
 | serverc     | 172.25.250.12   | Headless    | 1   | 2048        | 1 × 10GB (OS), 3 × 5GB (blank)          |
 
+The VMs that are created are not subscribed to the Red Hat repositories, instead the DVD ISO is mounted into the VM and configured as a repository. This enables package installation without a subscription. If you wish to subscribe the VMs consider creating an account and joining the [developer program](https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux).
+
 ## Setup
 
 To use this repository perform the following steps on a Fedora or Enterprise Linux distribution:
 
-- [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible). 
+- [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible).
+- [Download the RHEL 9.3 DVD ISO image](https://developers.redhat.com/products/rhel/download#exploreotherredhatproducts). Place the ISO in a location that it will live at permanently.
 - Download this repository onto your local machine and change into the project directory.
-- Review and update the variables in [vars/rhel_lab_vars.yml](vars/rhel_lab_vars.yml) as desired.
+- Review and update the variables in [vars/rhel_lab_vars.yml](vars/rhel_lab_vars.yml) as desired. Especially update the **user_name**, **os_variant**, and **iso_path** variables.
 - Run `ansible-galaxy install -r collections/requirements.yml` to install the [community.libvirt collection](https://galaxy.ansible.com/ui/repo/published/community/libvirt/)
 
 
@@ -67,11 +74,17 @@ ssh servera-root # Connect to root user
 
 This lab environment intended to be used by students to learn the basics of Linux and RHEL. You can also learn the basics of Linux security by correcting the issues below:
 
-- The passwords are stored in plaintext.
-- A shared SSH key is used on all machines.
-- SSH Host Key Checking has been relaxed.
-- The root account allows ssh access.
-- The servers are not subscribed to the Red Hat repositories to receive security updates.
+### Insecure Passwords
+
+The passwords are stored in plaintext in the kickstart file. They have no special characters. They never expire.
+
+### Insecure SSH Access
+
+A shared SSH key is used on all machines. The root account is accessible over ssh. SSH Host Key Checking has been relaxed.
+
+### Insecure Software Packages
+
+The servers are not subscribed to the Red Hat repositories to receive security updates.
 
 ## Contributing
 

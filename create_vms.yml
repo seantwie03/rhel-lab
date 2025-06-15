@@ -85,13 +85,13 @@
               virt-install
               --name={{ item.hostname }}
               --os-type=linux
-              --os-variant=rhel9.3
+              --os-variant={{ os_variant }}
               --vcpus=2
               --ram=6000
               --network network=lab-example-com
-              --disk /var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso,device=cdrom,readonly=on
+              --disk {{ iso_path }},device=cdrom,readonly=on
               --disk path=/var/lib/libvirt/images/{{ item.hostname }}-os.qcow2,size=20,boot.order=1
-              --location /var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso
+              --location {{ iso_path }}
               --initrd-inject=/var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
               --extra-args="inst.ks=file:ks-{{ item.hostname }}.cfg"
               --noautoconsole
@@ -106,16 +106,16 @@
               virt-install
               --name={{ item.hostname }}
               --os-type=linux
-              --os-variant=rhel9.3
+              --os-variant={{ os_variant }}
               --vcpus=1
               --ram=2048
               --network network=lab-example-com
-              --disk /var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso,device=cdrom,readonly=on
+              --disk {{ iso_path }},device=cdrom,readonly=on
               --disk path=/var/lib/libvirt/images/{{ item.hostname }}-os.qcow2,size=10,boot.order=1
               --disk path=/var/lib/libvirt/images/{{ item.hostname }}-1.qcow2,size=5,boot.order=2
               --disk path=/var/lib/libvirt/images/{{ item.hostname }}-2.qcow2,size=5,boot.order=3
               --disk path=/var/lib/libvirt/images/{{ item.hostname }}-3.qcow2,size=5,boot.order=4
-              --location /var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso
+              --location {{ iso_path }}
               --initrd-inject=/var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
               --extra-args="inst.ks=file:ks-{{ item.hostname }}.cfg"
               --noautoconsole
