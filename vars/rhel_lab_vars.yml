@@ -1,5 +1,7 @@
 ---
 user_name: sean
+os_variant: rhel9.3 # Run `osinfo-query os` to see available variants
+iso_path: /var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso
 graphical_workstations:
   - hostname: workstation
     system_type: graphical
