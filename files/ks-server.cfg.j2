@@ -26,6 +26,8 @@ cdrom
 @^graphical-server-environment
 vim
 bash-completion
+man-pages
+man-db
 %end
 
 {% else %}
@@ -38,6 +40,8 @@ skipx
 kexec-tools
 vim
 bash-completion
+man-pages
+man-db
 %end
 
 {% endif %}
@@ -137,6 +141,9 @@ cat > /etc/ssh/ssh_config.d/host-key-checking.conf << 'EOF'
 Host *
   StrictHostKeyChecking=accept-new
 EOF
+
+echo "Update the manual database"
+mandb
 
 %end
 
