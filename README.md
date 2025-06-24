@@ -89,3 +89,9 @@ The servers are not subscribed to the Red Hat repositories to receive security u
 ## Contributing
 
 This repo is setup a bit weird. The [community.libvirt collection](https://galaxy.ansible.com/ui/repo/published/community/libvirt/) is not idempotent. This means the create and destroy playbooks are not idempotent. It felt weird to create a non-idempotent role, so I left the tasks in the playbook files.
+
+## Alternates
+
+Another way I could've accomplished this is with Vagrant's [Ansible Provisioners](https://developer.hashicorp.com/vagrant/docs/provisioning/ansible_intro). This is likely the direction I would go if I needed to support other operating systems besides Fedora and Enterprise Linux. 
+
+This approach with Vagrant would make the VMs more ephemeral. Instead of using snapshots you could just delete and recreate the VM. This opens the door to spin up VMs with specific configurations for exercises. For example, one of the Vagrantfiles could have a VM preconfigured with NFS and on the other VM you must login and mount the NFS share.
