@@ -95,3 +95,15 @@ This repo is setup a bit weird. The [community.libvirt collection](https://galax
 Another way I could've accomplished this is with Vagrant's [Ansible Provisioners](https://developer.hashicorp.com/vagrant/docs/provisioning/ansible_intro). This is likely the direction I would go if I needed to support other operating systems besides Fedora and Enterprise Linux. 
 
 This approach with Vagrant would make the VMs more ephemeral. Instead of using snapshots you could just delete and recreate the VM. This opens the door to spin up VMs with specific configurations for exercises. For example, one of the Vagrantfiles could have a VM preconfigured with NFS and on the other VM you must login and mount the NFS share.
+
+## TODO
+
+- Add extra nics on host-only network to practice IP config
+- Add ~/.terminfo/kitty.terminfo, ~/.terminfo/78/xterm-kitty and ~/.terminfo/x/xterm-kitty to root, student, and /etc/skel/
+    - Also ghostty?
+- Add mlocate?
+    - dnf install mlocate
+    - systemctl start mlocate-updatedb # force the first run
+        - or
+        - /usr/libexec/mlocate-run-updatedb
+        - updatedb

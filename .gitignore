@@ -10,3 +10,7 @@ pip-delete-this-directory.txt
 
 # Ansible
 .ansible/
+
+# IDEs
+.vscode/
+.idea/
