@@ -168,6 +168,7 @@
                 Hostname {{ item.hostname }}.lab.example.com
                 User student
                 IdentityFile ~/.ssh/rhel_lab_key
+                StrictHostKeyChecking no
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
           loop: "{{ headless_servers }}"
 
