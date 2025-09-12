@@ -14,3 +14,7 @@ pip-delete-this-directory.txt
 # IDEs
 .vscode/
 .idea/
+
+# VMs
+.vagrant/
+build/
