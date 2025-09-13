@@ -78,6 +78,7 @@ Vagrant.configure("2") do |config|
         if vm_config[:system_type] == "graphical"
           vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
           #vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+          vb.gui = true
         end
 
         # Attach the RHEL ISO as a DVD
@@ -126,10 +127,12 @@ EOF
         # 2. Install software packages based on system type
         echo "Installing packages..."
         if [ "#{vm_config[:system_type]}" = "graphical" ]; then
-          dnf groupinstall -y "Server with GUI"
+          dnf groupinstall -y "Server with GUI" --exclude gnome-tour
+          systemctl set-default graphical.target
           # Remove nomodeset from kernel command line if it exists
           grubby --update-kernel=ALL --remove-args=nomodeset
-          systemctl set-default graphical.target
+          # Disable 'System Not Registered' Nag message
+          systemctl --global mask org.gnome.SettingsDaemon.Subscription.service
         else
           dnf groupinstall -y "Minimal Install"
         fi
