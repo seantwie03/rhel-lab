@@ -75,6 +75,11 @@ Vagrant.configure("2") do |config|
         vb.cpus = vm_config[:cpus]
         vb.memory = vm_config[:memory]
 
+        if vm_config[:system_type] == "graphical"
+          vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+          #vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+        end
+
         # Attach the RHEL ISO as a DVD
         vb.customize ["storageattach", :id, "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--type", "dvddrive", "--medium", RHEL_ISO_PATH]
 
@@ -122,6 +127,8 @@ EOF
         echo "Installing packages..."
         if [ "#{vm_config[:system_type]}" = "graphical" ]; then
           dnf groupinstall -y "Server with GUI"
+          # Remove nomodeset from kernel command line if it exists
+          grubby --update-kernel=ALL --remove-args=nomodeset
           systemctl set-default graphical.target
         else
           dnf groupinstall -y "Minimal Install"
@@ -158,7 +165,18 @@ EOF
         sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
         systemctl restart sshd
 
+        echo "--- Creating udev rules for persistent disk names ---"
+        cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
+KERNEL=="sda", SYMLINK+="vda"
+KERNEL=="sdb", SYMLINK+="vdb"
+KERNEL=="sdc", SYMLINK+="vdc"
+KERNEL=="sdd", SYMLINK+="vdd"
+EOF
+        udevadm trigger
+        echo "--- udev rules created ---"
+
         echo "--- Provisioning Complete ---"
+        reboot
       SHELL
     end
   end
