@@ -18,5 +18,6 @@ pip-delete-this-directory.txt
 # VMs
 .vagrant/
 build/
-*.tar.gz
+*.tar*
 *.iso
+*.ISO

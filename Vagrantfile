@@ -62,6 +62,13 @@ Vagrant.configure("2") do |config|
     raise "Please update the RHEL_ISO_PATH variable in your Vagrantfile before running 'vagrant up'."
   end
 
+  # Enable the use of vagrant ssh with the student user
+  VAGRANT_COMMAND = ARGV[0]
+  if VAGRANT_COMMAND == "ssh"
+    config.ssh.username = "student"
+    config.ssh.private_key_path = "files/lab_rsa"
+  end
+
   # Common configuration for all VMs
   config.vm.box = "generic/rhel9"
   config.vm.box_version = "4.3.12"
@@ -74,27 +81,45 @@ Vagrant.configure("2") do |config|
       node.vm.network "private_network", ip: vm_config[:ip], virtualbox__intnet: true
 
       # Configure VirtualBox provider settings
-      node.vm.provider "virtualbox" do |vb|
-        vb.name = vm_config[:hostname]
-        vb.cpus = vm_config[:cpus]
-        vb.memory = vm_config[:memory]
+      if Vagrant.has_plugin?("vagrant-virtualbox")
+        node.vm.provider "virtualbox" do |vb|
+          vb.name = vm_config[:hostname]
+          vb.cpus = vm_config[:cpus]
+          vb.memory = vm_config[:memory]
 
-        # Attach the RHEL ISO as a DVD
-        vb.customize ["storageattach", :id, "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--type", "dvddrive", "--medium", RHEL_ISO_PATH]
-
-        if vm_config[:system_type] == "graphical"
-          vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
-          vb.gui = true
-          #vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-        end
-
-        # Create and attach additional data disks for servers
-        vm_config[:data_disks].each_with_index do |disk_size, i|
-          disk_path = "build/#{vm_config[:hostname]}-disk-#{i+1}.vdi"
-          unless File.exist?(disk_path)
-            vb.customize ["createhd", "--filename", disk_path, "--size", disk_size * 1024]
+          if vm_config[:hostname] == "workstation"
+            vb.gui = true
+            vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+            vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
           end
-          vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", i+1, "--device", "0", "--type", "hdd", "--medium", disk_path]
+
+          # Attach the RHEL ISO as a DVD
+          vb.customize ["storageattach", :id, "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--type", "dvddrive", "--medium", RHEL_ISO_PATH]
+
+          # Create and attach additional data disks for servers
+          vm_config[:data_disks].each_with_index do |disk_size, i|
+            disk_path = "build/#{vm_config[:hostname]}-disk-#{i+1}.vdi"
+            unless File.exist?(disk_path)
+              vb.customize ["createhd", "--filename", disk_path, "--size", disk_size * 1024]
+            end
+            vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", i+1, "--device", "0", "--type", "hdd", "--medium", disk_path]
+          end
+        end
+      end
+
+      # Configure Libvirt provider settings
+      node.vm.provider "libvirt" do |libvirt|
+        libvirt.driver = "kvm"
+        libvirt.cpus = vm_config[:cpus]
+        libvirt.memory = vm_config[:memory]
+
+        # Attach the RHEL ISO as a CD-ROM
+        libvirt.cdrom RHEL_ISO_PATH
+
+        # Configure disks for libvirt
+        libvirt.storage :file, size: vm_config[:os_disk_size], device: "vda"
+        vm_config[:data_disks].each_with_index do |disk_size, i|
+          libvirt.storage :file, size: "#{disk_size}GB", device: "vd#{('b'.ord + i).chr}"
         end
       end
 
@@ -150,32 +175,14 @@ EOF
 
           # Disable 'System Not Registered' Nag message
           systemctl --global mask org.gnome.SettingsDaemon.Subscription.service
-
-          # Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
-          # This section uses udev to create symlinks so that the drives can be accessed
-          # using either sd[a-z] OR vd[a-z].
-          cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
-  KERNEL=="sda", SYMLINK+="vda"
-  EOF
-          udevadm trigger
         SHELL
       end
 
       # Configure headless systems
       if vm_config[:system_type] == "headless"
         node.vm.provision "shell", inline: <<-SHELL
-          echo "Configure headless system"
+          echo "Configure headless systems"
           dnf groupinstall -y "Minimal Install"
-          # Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
-          # This section uses udev to create symlinks so that the drives can be accessed
-          # using either sd[a-z] OR vd[a-z].
-          cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
-KERNEL=="sda", SYMLINK+="vda"
-KERNEL=="sdb", SYMLINK+="vdb"
-KERNEL=="sdc", SYMLINK+="vdc"
-KERNEL=="sdd", SYMLINK+="vdd"
-EOF
-          udevadm trigger
         SHELL
       end
 
@@ -241,17 +248,26 @@ EOF
         SHELL
       end
 
+      # Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
+      # This section uses udev to create symlinks so that the drives can be accessed
+      # using either sd[a-z] OR vd[a-z].
+      if Vagrant.has_plugin?("vagrant-virtualbox")
+        node.vm.provision "shell", inline: <<-SHELL
+          echo "--- Creating udev rules for persistent disk names ---"
+          cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
+KERNEL=="sda", SYMLINK+="vda"
+KERNEL=="sdb", SYMLINK+="vdb"
+KERNEL=="sdc", SYMLINK+="vdc"
+KERNEL=="sdd", SYMLINK+="vdd"
+EOF
+          udevadm trigger
+        SHELL
+      end
+
       # Reboot after provisioning
       node.vm.provision "shell", inline: "reboot"
     end
   end
-
-  VAGRANT_COMMAND = ARGV[0]
-  if VAGRANT_COMMAND == "ssh"
-    config.ssh.username = "student"
-    config.ssh.private_key_path = "files/lab_rsa"
-  end
-
 end
 
 # -*- mode: ruby -*-
