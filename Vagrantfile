@@ -257,7 +257,7 @@ EOF
   end
 
   # Reboot after provisioning
-  config.trigger.after :provision :up :reload do |t|
+  config.trigger.after :provision, :up, :reload do |t|
     t.name = "Reboot after provisioning"
     t.run = { :inline => "vagrant reload" }
   end
