@@ -62,13 +62,6 @@ Vagrant.configure("2") do |config|
     raise "Please update the RHEL_ISO_PATH variable in your Vagrantfile before running 'vagrant up'."
   end
 
-  # Enable the use of vagrant ssh with the student user
-  VAGRANT_COMMAND = ARGV[0]
-  if VAGRANT_COMMAND == "ssh"
-    config.ssh.username = "student"
-    config.ssh.private_key_path = "files/lab_rsa"
-  end
-
   # Common configuration for all VMs
   config.vm.box = "generic/rhel9"
   config.vm.box_version = "4.3.12"
@@ -81,7 +74,6 @@ Vagrant.configure("2") do |config|
       node.vm.network "private_network", ip: vm_config[:ip], virtualbox__intnet: true
 
       # Configure VirtualBox provider settings
-      if Vagrant.has_plugin?("vagrant-virtualbox")
         node.vm.provider "virtualbox" do |vb|
           vb.name = vm_config[:hostname]
           vb.cpus = vm_config[:cpus]
@@ -90,7 +82,7 @@ Vagrant.configure("2") do |config|
           if vm_config[:hostname] == "workstation"
             vb.gui = true
             vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
-            vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+            #vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
           end
 
           # Attach the RHEL ISO as a DVD
@@ -104,8 +96,21 @@ Vagrant.configure("2") do |config|
             end
             vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", i+1, "--device", "0", "--type", "hdd", "--medium", disk_path]
           end
+
+          # Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
+          # This section uses udev to create symlinks so that the drives can be accessed
+          # using either sd[a-z] OR vd[a-z].
+          node.vm.provision "shell", inline: <<-SHELL
+            echo "Creating udev rules for vd[a-z] disk names"
+            cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
+KERNEL=="sda", SYMLINK+="vda"
+KERNEL=="sdb", SYMLINK+="vdb"
+KERNEL=="sdc", SYMLINK+="vdc"
+KERNEL=="sdd", SYMLINK+="vdd"
+EOF
+            udevadm trigger
+          SHELL
         end
-      end
 
       # Configure Libvirt provider settings
       node.vm.provider "libvirt" do |libvirt|
@@ -248,26 +253,22 @@ EOF
         SHELL
       end
 
-      # Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
-      # This section uses udev to create symlinks so that the drives can be accessed
-      # using either sd[a-z] OR vd[a-z].
-      if Vagrant.has_plugin?("vagrant-virtualbox")
-        node.vm.provision "shell", inline: <<-SHELL
-          echo "--- Creating udev rules for persistent disk names ---"
-          cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
-KERNEL=="sda", SYMLINK+="vda"
-KERNEL=="sdb", SYMLINK+="vdb"
-KERNEL=="sdc", SYMLINK+="vdc"
-KERNEL=="sdd", SYMLINK+="vdd"
-EOF
-          udevadm trigger
-        SHELL
-      end
-
-      # Reboot after provisioning
-      node.vm.provision "shell", inline: "reboot"
     end
   end
+
+  # Reboot after provisioning
+  config.trigger.after :provision :up :reload do |t|
+    t.name = "Reboot after provisioning"
+    t.run = { :inline => "vagrant reload" }
+  end
+
+  # Enable the use of vagrant ssh with the student user
+  VAGRANT_COMMAND = ARGV[0]
+  if VAGRANT_COMMAND == "ssh"
+    config.ssh.username = "student"
+    config.ssh.private_key_path = "files/lab_rsa"
+  end
+
 end
 
 # -*- mode: ruby -*-
