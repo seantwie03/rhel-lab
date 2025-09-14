@@ -18,4 +18,5 @@ pip-delete-this-directory.txt
 # VMs
 .vagrant/
 build/
-lab_files/
+*.tar.gz
+*.iso

@@ -113,7 +113,7 @@
 
         - name: Remove rhel lab key
           ansible.builtin.file:
-            dest: "/home/{{ user_name }}/.ssh/rhel_lab_key"
+            dest: "/home/{{ user_name }}/.ssh/lab_rsa"
             state: absent
 
         - name: Remove SSH config for headless servers

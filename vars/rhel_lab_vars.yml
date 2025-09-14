@@ -13,8 +13,8 @@ headless_servers:
   - hostname: serverb
     system_type: headless
     ip: 172.25.250.11
-  - hostname: serverc
-    system_type: headless
-    ip: 172.25.250.12
-rhel_lab_private_key: "{{ lookup('file', 'files/rhel_lab_key') }}"
-rhel_lab_public_key: "{{ lookup('file', 'files/rhel_lab_key.pub') }}"
+  # - hostname: serverc
+  #   system_type: headless
+  #   ip: 172.25.250.12
+rhel_lab_private_key: "{{ lookup('file', 'files/lab_rsa') }}"
+rhel_lab_public_key: "{{ lookup('file', 'files/lab_rsa.pub') }}"
