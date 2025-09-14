@@ -5,7 +5,13 @@
 # 2. Download the RHEL 9.3 ISO using your Developer Subscription
 # 3. Update the RHEL_ISO_PATH variable below to the absolute path of your
 #    RHEL 9.3+ DVD ISO file.
-# 4. Download the Red Hat Academy lab files and place them in ./lab_files
+# 4. Download the Red Hat Academy lab files and place them in ./files
+# 5. (LINUX ONLY) Run the following commands to allow the Host-Only 
+#    network to have IPs outside of the 192.168.56.0/24 range.
+#      sudo mkdir -p /etc/vbox
+#      sudo vim /etc/vbox/networks.conf
+#      # Add the following line
+#      * 172.25.250.0/24
 #
 
 RHEL_ISO_PATH = "/var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso"
@@ -14,7 +20,7 @@ RHEL_ISO_PATH = "/var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso"
 VMS = [
   {
     hostname: "workstation",
-    ip: "192.168.56.9",
+    ip: "172.25.250.9",
     system_type: "graphical",
     cpus: 2,
     memory: 6000,
@@ -23,7 +29,7 @@ VMS = [
   },
   {
     hostname: "servera",
-    ip: "192.168.56.10",
+    ip: "172.25.250.10",
     system_type: "headless",
     cpus: 1,
     memory: 2048,
@@ -32,7 +38,7 @@ VMS = [
   },
   {
     hostname: "serverb",
-    ip: "192.168.56.11",
+    ip: "172.25.250.11",
     system_type: "headless",
     cpus: 1,
     memory: 2048,
@@ -41,7 +47,7 @@ VMS = [
   },
   # {
   #   hostname: "serverc",
-  #   ip: "192.168.56.12",
+  #   ip: "172.25.250.12",
   #   system_type: "headless",
   #   cpus: 1,
   #   memory: 2048,
@@ -59,15 +65,13 @@ Vagrant.configure("2") do |config|
   # Common configuration for all VMs
   config.vm.box = "generic/rhel9"
   config.vm.box_version = "4.3.12"
-  config.ssh.insert_key = true
-  #config.ssh.username = "student"
-  #config.ssh.private_key_path = "lab_rsa"
+  config.ssh.insert_key = false
 
   # Define and configure each VM based on the VMS data structure
   VMS.each do |vm_config|
     config.vm.define vm_config[:hostname] do |node|
       node.vm.hostname = "#{vm_config[:hostname]}.lab.example.com"
-      node.vm.network "private_network", ip: vm_config[:ip]
+      node.vm.network "private_network", ip: vm_config[:ip], virtualbox__intnet: true
 
       # Configure VirtualBox provider settings
       node.vm.provider "virtualbox" do |vb|
@@ -94,8 +98,8 @@ Vagrant.configure("2") do |config|
         end
       end
 
-      node.vm.provision "file", source: "lab_rsa", destination: "/tmp/lab_rsa"
-      node.vm.provision "file", source: "lab_rsa.pub", destination: "/tmp/lab_rsa.pub"
+      node.vm.provision "file", source: "files/lab_rsa", destination: "/tmp/lab_rsa"
+      node.vm.provision "file", source: "files/lab_rsa.pub", destination: "/tmp/lab_rsa.pub"
 
       # Configure dnf to use the attached RHEL DVD
       node.vm.provision "shell", inline: <<-SHELL
@@ -222,8 +226,8 @@ EOF
       SHELL
 
       # Add Red Hat Academy lab command to workstation system
-      if vm_config[:hostname] == "workstation" && File.exist?("rha-labs.tar.gz")
-        node.vm.provision "file", source: "rha-labs.tar.gz", destination: "/tmp/rha-labs.tar.gz"
+      if vm_config[:hostname] == "workstation" && File.exist?("files/rha-labs.tar.gz")
+        node.vm.provision "file", source: "files/rha-labs.tar.gz", destination: "/tmp/rha-labs.tar.gz"
         node.vm.provision "shell", inline: <<-SHELL
           echo "Add Red Hat Academy lab command to workstation system"
           # Extract lab files to student's home directory
@@ -241,6 +245,13 @@ EOF
       node.vm.provision "shell", inline: "reboot"
     end
   end
+
+  VAGRANT_COMMAND = ARGV[0]
+  if VAGRANT_COMMAND == "ssh"
+    config.ssh.username = "student"
+    config.ssh.private_key_path = "files/lab_rsa"
+  end
+
 end
 
 # -*- mode: ruby -*-
