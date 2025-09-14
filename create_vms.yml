@@ -148,10 +148,18 @@
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
 
-        - name: Copy rhel lab key
+        - name: Copy lab_rsa.pub key
           ansible.builtin.copy:
-            src: files/rhel_lab_key
-            dest: "/home/{{ user_name }}/.ssh/rhel_lab_key"
+            src: files/lab_rsa.pub
+            dest: "/home/{{ user_name }}/.ssh/lab_rsa.pub"
+            mode: "0600"
+            owner: "{{ user_name }}"
+            group: "{{ user_name }}"
+
+        - name: Copy lab_rsa key
+          ansible.builtin.copy:
+            src: files/lab_rsa
+            dest: "/home/{{ user_name }}/.ssh/lab_rsa"
             mode: "0600"
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
@@ -167,7 +175,7 @@
               Host {{ item.hostname }}
                 Hostname {{ item.hostname }}.lab.example.com
                 User student
-                IdentityFile ~/.ssh/rhel_lab_key
+                IdentityFile ~/.ssh/lab_rsa
                 StrictHostKeyChecking no
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
           loop: "{{ headless_servers }}"
@@ -183,7 +191,7 @@
               Host {{ item.hostname }}-root
                 Hostname {{ item.hostname }}.lab.example.com
                 User root
-                IdentityFile ~/.ssh/rhel_lab_key
+                IdentityFile ~/.ssh/lab_rsa
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
           loop: "{{ headless_servers }}"
 
@@ -198,7 +206,7 @@
               Host {{ item.hostname }}
                 Hostname {{ item.hostname }}.lab.example.com
                 User student
-                IdentityFile ~/.ssh/rhel_lab_key
+                IdentityFile ~/.ssh/lab_rsa
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
           loop: "{{ graphical_workstations }}"
 
@@ -213,6 +221,6 @@
               Host {{ item.hostname }}-root
                 Hostname {{ item.hostname }}.lab.example.com
                 User root
-                IdentityFile ~/.ssh/rhel_lab_key
+                IdentityFile ~/.ssh/lab_rsa
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
-          loop: "{{ headless_servers }}"
+          loop: "{{ graphical_workstations }}"
