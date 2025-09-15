@@ -200,9 +200,10 @@ Vagrant.configure("2") do |config|
         echo "student ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/student
 
         # Disable SSH host key checking in the lab environment
-        cat > /etc/ssh/ssh_config.d/99-lab.conf <<-'EOF'
+        cat > /etc/ssh/ssh_config.d/01-training.conf <<-'EOF'
 					Host *
 					    StrictHostKeyChecking no
+					    ServerAliveInterval 100
 				EOF
 
         # Configure the /etc/hosts file
