@@ -2,9 +2,7 @@
 # IMPORTANT:
 #
 # 1. Install Vagrant and VirtualBox.
-# 2. Download the RHEL 9.3 ISO using your Developer Subscription
-# 3. Update the RHEL_ISO_PATH variable below to the absolute path of your
-#    RHEL 9.3+ DVD ISO file.
+# 2. Download the RHEL 9.3 ISO using your Developer Subscription 3. Update the RHEL_ISO_PATH variable below to the absolute path of your RHEL 9.3+ DVD ISO file.
 # 4. Download the Red Hat Academy lab files and place them in ./files
 # 5. (LINUX ONLY) Run the following commands to allow the Host-Only 
 #    network to have IPs outside of the 192.168.56.0/24 range.
@@ -232,7 +230,6 @@ Vagrant.configure("2") do |config|
 					mkdir -p /home/student/.config/autostart
 					cp /usr/share/applications/org.gnome.Terminal.desktop /home/student/.config/autostart/
 					sed -i 's/^Exec=.*$/^Exec=gnome-terminal --preferences --maximize/'  /home/student/.config/autostart/org.gnome.Terminal.desktop
-
 				SHELL
 			end
 
@@ -281,4 +278,4 @@ end
 
 # Yes, tabs are annoying, but this file uses a LOT of HEREDOCs. 
 # If I don't use tabs, then I can't indent the HEREDOCs at all.
-# vi: set ft=ruby noexpandtab tabstop=2 shiftwidth=2 :
+# vi: set ft=ruby noexpandtab tabstop=2 shiftwidth=2 nolist :
