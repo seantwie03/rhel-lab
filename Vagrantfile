@@ -253,13 +253,14 @@ EOF
         SHELL
       end
 
-    end
-  end
+      config.vm.provision "custom_reboot", type: "shell", reboot: true, inline: <<-SHELL
+echo "----------"
+echo "| REBOOT |"
+echo "----------"
+      SHELL
 
-  # Reboot after provisioning
-  config.trigger.after :provision, :up, :reload do |t|
-    t.name = "Reboot after provisioning"
-    t.run = { :inline => "vagrant reload" }
+    end
+
   end
 
   # Enable the use of vagrant ssh with the student user
