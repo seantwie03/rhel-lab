@@ -226,6 +226,12 @@ EOF
 
           # Disable 'System Not Registered' Nag message
           systemctl --global mask org.gnome.SettingsDaemon.Subscription.service
+
+					# Configure the terminal to autostart
+					mkdir -p /home/student/.config/autostart
+					cp /usr/share/applications/org.gnome.Terminal.desktop /home/student/.config/autostart/
+					sed -i 's/^Exec=.*$/^Exec=gnome-terminal --preferences --maximize/'  /home/student/.config/autostart/org.gnome.Terminal.desktop
+
         SHELL
       end
 
