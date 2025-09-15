@@ -12,6 +12,7 @@
 #      sudo vim /etc/vbox/networks.conf
 #      # Add the following line
 #      * 172.25.250.0/24
+#    More details here: https://www.virtualbox.org/manual/ch06.html#network_hostonly
 #
 
 RHEL_ISO_PATH = "/var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso"
@@ -101,7 +102,6 @@ Vagrant.configure("2") do |config|
           # This section uses udev to create symlinks so that the drives can be accessed
           # using either sd[a-z] OR vd[a-z].
           node.vm.provision "shell", inline: <<-SHELL
-            echo "Creating udev rules for vd[a-z] disk names"
             cat > /etc/udev/rules.d/99-persistent-disk.rules << 'EOF'
 KERNEL=="sda", SYMLINK+="vda"
 KERNEL=="sdb", SYMLINK+="vdb"
@@ -253,7 +253,7 @@ EOF
         SHELL
       end
 
-      config.vm.provision "custom_reboot", type: "shell", reboot: true, inline: <<-SHELL
+      node.vm.provision "custom_reboot", type: "shell", reboot: true, inline: <<-SHELL
 echo "----------"
 echo "| REBOOT |"
 echo "----------"
