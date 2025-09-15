@@ -162,6 +162,9 @@ EOF
         dnf clean all > /dev/null
 
         # Install some nice-to-have extras
+        dnf install -y sshpass
+
+        # Install some nice-to-have extras
         dnf install -y vim bash-completion man-pages man-db
       SHELL
 
