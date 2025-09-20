@@ -25,7 +25,7 @@ The VMs that are created are not subscribed to the Red Hat repositories, instead
 
 ### Branches
 
-This repository has 3 branches. Each branch creates similar VMs, but they all use different techonlogy to do so.
+This repository has 3 branches. Each branch creates similar VMs, but they all use different techonlogy to do so. If you don't care which underlying technology is used, stick with the `main` branch.
 
 | Branch            | VM Creation      | VM Configuration        | Hypervisors | Operating Systems |
 | ----------------- | ---------------- | ----------------------- | --------------- | ---------------- |
