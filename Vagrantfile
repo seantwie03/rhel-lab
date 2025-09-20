@@ -116,8 +116,8 @@ Vagrant.configure("2") do |config|
 				end
 			end
 
-			node.vm.provision "file", source: "files/lab_rsa", destination: "/tmp/lab_rsa"
-			node.vm.provision "file", source: "files/lab_rsa.pub", destination: "/tmp/lab_rsa.pub"
+			node.vm.provision "file", source: "provisioning/files/lab_rsa", destination: "/tmp/lab_rsa"
+			node.vm.provision "file", source: "provisioning/files/lab_rsa.pub", destination: "/tmp/lab_rsa.pub"
 
 			# Provisioner 1: Configure DNF and install Ansible
 			node.vm.provision "shell", inline: <<-SHELL
@@ -161,33 +161,19 @@ Vagrant.configure("2") do |config|
 					:system_type => vm_config[:system_type],
 					:hostname => vm_config[:hostname],
 					:vagrant_provider => node.vm.provider_name.to_s,
-					:rha_labs_file_exists => File.exist?("files/rha-labs.tar.gz"),
+					:rha_labs_file_exists => File.exist?("provisioning/files/rha-labs.tar.gz"),
 					:etc_hosts_entries => hosts_entry
 				}
 			end
-
-			# Add Red Hat Academy lab command to workstation system
-			if vm_config[:hostname] == "workstation" && File.exist?("files/rha-labs.tar.gz")
-				node.vm.provision "file", source: "files/rha-labs.tar.gz", destination: "/tmp/rha-labs.tar.gz"
-			end
-
-			node.vm.provision "custom_reboot", type: "shell", reboot: true, inline: <<-SHELL
-				echo "----------"
-				echo "| REBOOT |"
-				echo "----------"
-			SHELL
-
 		end
-
 	end
 
 	# Enable the use of vagrant ssh with the student user
 	VAGRANT_COMMAND = ARGV[0]
 	if VAGRANT_COMMAND == "ssh"
 		config.ssh.username = "student"
-		config.ssh.private_key_path = "files/lab_rsa"
+		config.ssh.private_key_path = "provisioning/files/lab_rsa"
 	end
-
 end
 
 # Yes, tabs are annoying, but this file uses a LOT of HEREDOCs. 
