@@ -243,8 +243,8 @@ Vagrant.configure("2") do |config|
 			end
 
 			# Add Red Hat Academy lab command to workstation system
-			if vm_config[:hostname] == "workstation" && File.exist?("files/rha-labs.tar.gz")
-				node.vm.provision "file", source: "files/rha-labs.tar.gz", destination: "/tmp/rha-labs.tar.gz"
+			if vm_config[:hostname] == "workstation" && File.exist?("rha-labs.tar.gz")
+				node.vm.provision "file", source: "rha-labs.tar.gz", destination: "/tmp/rha-labs.tar.gz"
 				node.vm.provision "shell", inline: <<-SHELL
 					echo "Add Red Hat Academy lab command to workstation system"
 					# Extract lab files to student's home directory
