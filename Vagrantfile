@@ -161,7 +161,7 @@ Vagrant.configure("2") do |config|
 					:system_type => vm_config[:system_type],
 					:hostname => vm_config[:hostname],
 					:vagrant_provider => node.vm.provider_name.to_s,
-					:rha_labs_file_exists => File.exist?("provisioning/files/rha-labs.tar.gz"),
+					:rha_labs_file_exists => File.exist?("rha-labs.tar.gz"),
 					:etc_hosts_entries => hosts_entry
 				}
 			end
