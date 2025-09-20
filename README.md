@@ -6,7 +6,7 @@ This repo contains a Vagrantfile to install and setup several Virtual Machines t
 
 This lab environment is loosely based off of the [Red Hat Academy](https://www.redhat.com/en/services/training/red-hat-academy) lab environment for the [RHCSA](https://www.redhat.com/en/services/certification/rhcsa) and [RHCE](https://www.redhat.com/en/services/certification/rhce) courses.
 
-**Hypervisor**: VirtualBox or Libvirt
+**Hypervisor**: [VirtualBox](https://www.virtualbox.org/) or [Libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt)
 
 **VM Manager**: [Vagrant](https://developer.hashicorp.com/vagrant)
 
@@ -28,7 +28,7 @@ The VMs that are created are not subscribed to the Red Hat repositories, instead
 To use this repository perform the following steps on a Fedora or Enterprise Linux distribution:
 
 - [Install Vagrant](https://developer.hashicorp.com/vagrant/downloads).
-- [Install a Vagrant Provider](https://developer.hashicorp.com/vagrant/docs/providers). This repository has been tested with the [Libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) and [VirtualBox](https://www.virtualbox.org/) providers.
+- [Install a Vagrant Provider](https://developer.hashicorp.com/vagrant/docs/providers) (VirtualBox or Libvirt Only).
 - [Download the RHEL 9.3 DVD ISO image](https://developers.redhat.com/products/rhel/download#exploreotherredhatproducts). Place the ISO in a location that it will live at permanently.
 - Download this repository onto your local machine and change into the project directory.
     - Update the `RHEL_ISO_PATH` variable in the `Vagrantfile` with the full path to the ISO.
