@@ -82,7 +82,7 @@ vagrant ssh servera # Connects to student user
 # You can substitute servera for any of the other hostnames
 ```
 
-If you want to SSH directly without using Vagrant, you can add configure your `/etc/hosts` or `~/.ssh/config` for SSH access.
+If you want to SSH directly without using Vagrant, you can add configure your hosts file or ssh config for SSH access.
 
 ## Insecure Environment
 
