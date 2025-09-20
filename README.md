@@ -29,9 +29,9 @@ This repository has a few branches. Each branch will create the lab environment 
 
 | Branch            | VM Creation      | VM Configuration        | Hypervisors | Operating Systems |
 | ----------------- | ---------------- | ----------------------- | --------------- | ---------------- |
-| main              | Vagrant          | Vagrant Shell Provisioner | VirtualBox/Libvirt | Windows/Linux    |
-| ansible_kickstart | Ansible          | Kickstart               | Libvirt         | Linux            |
-| vagrant_ansible   | Vagrant          | Ansible Local Provisioner | VirtualBox/Libvirt | Windows/Linux    |
+| [main](https://github.com/seantwie03/rhel-lab/tree/main?tab=readme-ov-file) | Vagrant          | Vagrant Shell Provisioner | VirtualBox/Libvirt | Windows/Linux    |
+| [ansible_kickstart](https://github.com/seantwie03/rhel-lab/tree/ansible_kickstart?tab=readme-ov-file) | Ansible          | Kickstart               | Libvirt         | Linux            |
+| [vagrant_ansible](https://github.com/seantwie03/rhel-lab/tree/vagrant_ansible?tab=readme-ov-file) | Vagrant          | Ansible Local Provisioner | VirtualBox/Libvirt | Windows/Linux    |
 
 
 ## Setup
