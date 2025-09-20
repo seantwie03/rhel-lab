@@ -1,0 +1,13 @@
+---
+- name: Create udev rules for VirtualBox disk symlinks
+  ansible.builtin.copy:
+    dest: /etc/udev/rules.d/99-persistent-disk.rules
+    content: |
+      KERNEL=="sda", SYMLINK+="vda"
+      KERNEL=="sdb", SYMLINK+="vdb"
+      KERNEL=="sdc", SYMLINK+="vdc"
+      KERNEL=="sdd", SYMLINK+="vdd"
+  notify: Trigger udev
+
+- name: Flush handlers to apply udev rules immediately
+  meta: flush_handlers

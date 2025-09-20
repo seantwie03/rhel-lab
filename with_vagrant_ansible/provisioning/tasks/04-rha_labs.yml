@@ -1,0 +1,16 @@
+---
+- name: Extract Red Hat Academy lab files to student's home directory
+  ansible.builtin.unarchive:
+    src: /tmp/rha-labs.tar.gz
+    dest: /home/student
+    owner: student
+    group: student
+    remote_src: yes
+
+- name: Add RHA lab command location to system-wide profile
+  ansible.builtin.copy:
+    dest: /etc/profile.d/labs.sh
+    content: |
+      #!/bin/bash
+      export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/home/student/.venv/labs/bin
+    mode: '0755'

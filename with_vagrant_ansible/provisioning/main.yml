@@ -1,0 +1,32 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Include common tasks
+      include_tasks: tasks/01_common.yml
+
+    - name: Include VirtualBox udev tasks
+      include_tasks: tasks/05-udev_vbox.yml
+      when: vagrant_provider == "virtualbox"
+
+    - name: Include graphical system tasks
+      include_tasks: tasks/02-graphical.yml
+      when: system_type == "graphical"
+
+    - name: Include headless system tasks
+      include_tasks: tasks/03-headless.yml
+      when: system_type == "headless"
+
+    - name: Include Red Hat Academy lab tasks
+      include_tasks: tasks/04-rha_labs.yml
+      when: hostname == "workstation" and rha_labs_file_exists
+
+  handlers:
+    - name: Trigger udev
+      ansible.builtin.command: udevadm trigger
+
+    - name: Restart sshd
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
