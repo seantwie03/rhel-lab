@@ -37,7 +37,14 @@ To use this repository perform the following steps on a Fedora or Enterprise Lin
 
 The Virtual Machines created by this repository may work for some of the Red Hat Academy (RHA) labs. Supporting the RHA labs is outside of the scope of this project. If you want to try running the RHA labs you can, but it has not been tested and is certainly not garunteed to work.
 
-If you want to test your luck, you can extract the RHA Lab files and place them in a file called `rha-labs.tar.gz`. Place the `rha-labs.tar.gz` in the same directory as the Vagrantfile before running `vagrant up`. If you do this correctly, the shell provisioner inside the Vagrantfile will extract the files to the student's account in the Workstation VM.
+If you want to test your luck try this:
+
+- On the Workstation VM in the RHA Lab environment, run the following command: `tar -cvf rha-labs.tar.gz .venv .grading`.
+- Download the `rha-labs.tar.gz` to your local workstation.
+- Place `rha-labs.tar.gz` in the same folder as the Vagrantfile.
+- Run `vagrant up`
+
+If you do those steps correctly, the shell provisioner inside the Vagrantfile will extract the files to the student's account in the Workstation VM.
 
 ## Creating the Environment
 
