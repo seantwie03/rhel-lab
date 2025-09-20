@@ -65,10 +65,11 @@ Vagrant.configure("2") do |config|
 	config.vm.box = "generic/rhel9"
 	config.vm.box_version = "4.3.12"
 	config.ssh.insert_key = false
+	
 
 	# Define and configure each VM based on the VMS data structure
 	VMS.each do |vm_config|
-		config.vm.define vm_config[:hostname] do |node|
+		config.vm.define "#{vm_config[:hostname]}.lab.example.com" do |node|
 			node.vm.hostname = "#{vm_config[:hostname]}.lab.example.com"
 			node.vm.network "private_network", ip: vm_config[:ip], virtualbox__intnet: true
 
@@ -113,14 +114,14 @@ Vagrant.configure("2") do |config|
 			# Configure Libvirt provider settings
 			node.vm.provider "libvirt" do |libvirt|
 				libvirt.driver = "kvm"
+				libvirt.storage_pool_name = "rhel-lab"
 				libvirt.cpus = vm_config[:cpus]
 				libvirt.memory = vm_config[:memory]
 
 				# Attach the RHEL ISO as a CD-ROM
-				libvirt.cdrom RHEL_ISO_PATH
+				libvirt.storage :file, :device => :cdrom, :path => RHEL_ISO_PATH
 
 				# Create and attach additional data disks for servers
-				libvirt.storage :file, size: vm_config[:os_disk_size], device: "vda"
 				vm_config[:data_disks].each_with_index do |disk_size, i|
 					libvirt.storage :file, size: "#{disk_size}GB", device: "vd#{('b'.ord + i).chr}"
 				end
