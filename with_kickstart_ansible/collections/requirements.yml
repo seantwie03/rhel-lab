@@ -1,4 +1,0 @@
----
-collections:
-  - name: community.libvirt
-    version: 1.4.0
