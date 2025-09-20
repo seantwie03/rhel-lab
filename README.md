@@ -23,9 +23,9 @@ This lab environment is loosely based off of the [Red Hat Academy](https://www.r
 
 The VMs that are created are not subscribed to the Red Hat repositories, instead the DVD ISO is mounted into the VM and configured as a repository. This enables package installation without a subscription. If you wish to subscribe the VMs consider creating an account and joining the [developer program](https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux).
 
-### Branches
+### Options
 
-This repository has 3 branches. Each branch creates similar VMs, but they all use different techonlogy to do so. If you don't care which underlying technology is used, stick with the `main` branch.
+This repository has a few branches. Each branch will create the lab environment described above, but they use different techonlogy to do so. If you don't care which underlying technology is used, stick with the `main` branch.
 
 | Branch            | VM Creation      | VM Configuration        | Hypervisors | Operating Systems |
 | ----------------- | ---------------- | ----------------------- | --------------- | ---------------- |
