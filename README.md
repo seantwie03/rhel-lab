@@ -39,7 +39,10 @@ The Virtual Machines created by this repository may work for some of the Red Hat
 
 If you want to test your luck try this:
 
-- On the Workstation VM in the RHA Lab environment, run the following command: `tar -cvf rha-labs.tar.gz .venv .grading`.
+- On the Workstation VM in the RHA Lab environment, run the following command: 
+
+        tar -cvf rha-labs.tar.gz .venv .grading
+
 - Download the `rha-labs.tar.gz` to your local workstation.
 - Place `rha-labs.tar.gz` in the same folder as the Vagrantfile.
 - Run `vagrant up`
