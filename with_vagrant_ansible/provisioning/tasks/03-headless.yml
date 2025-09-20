@@ -1,5 +1,0 @@
----
-- name: Install packages for headless system
-  ansible.builtin.dnf:
-    name: "@Minimal Install"
-    state: present
