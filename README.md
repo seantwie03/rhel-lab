@@ -23,6 +23,17 @@ This lab environment is loosely based off of the [Red Hat Academy](https://www.r
 
 The VMs that are created are not subscribed to the Red Hat repositories, instead the DVD ISO is mounted into the VM and configured as a repository. This enables package installation without a subscription. If you wish to subscribe the VMs consider creating an account and joining the [developer program](https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux).
 
+### Branches
+
+This repository has 3 branches. Each branch creates similar VMs, but they all use different techonlogy to do so.
+
+| Branch            | VM Creation      | VM Configuration        | Hypervisor      | Operating System |
+| ----------------- | ---------------- | ----------------------- | --------------- | ---------------- |
+| main              | Vagrant          | Vagrant Shell Provisioner | VirtualBox/Libvirt | Windows/Linux    |
+| ansible_kickstart | Ansible          | Kickstart               | Libvirt         | Linux            |
+| vagrant_ansible   | Vagrant          | Ansible Local Provisioner | VirtualBox/Libvirt | Windows/Linux    |
+
+
 ## Setup
 
 To use this repository perform the following steps on a Fedora or Enterprise Linux distribution:
