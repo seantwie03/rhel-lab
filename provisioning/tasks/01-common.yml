@@ -37,10 +37,12 @@
         - lab_rsa.pub
 
     - name: Ensure authorized_keys for root contains lab key
-      ansible.posix.authorized_key:
-        user: root
-        key: "{{ lookup('file', '/tmp/lab_rsa.pub') }}"
-        state: present
+      ansible.builtin.copy:
+        src: /vagrant/provisioning/files/lab_rsa.pub
+        dest: /root/.ssh/authorized_keys
+        owner: root
+        group: root
+        mode: '0600'
 
 - name: Configure SSH daemon
   block:
@@ -89,10 +91,12 @@
         - lab_rsa.pub
 
     - name: Ensure authorized_keys for student contains lab key
-      ansible.posix.authorized_key:
-        user: student
-        key: "{{ lookup('file', '/tmp/lab_rsa.pub') }}"
-        state: present
+      ansible.builtin.copy:
+        src: /vagrant/provisioning/files/lab_rsa.pub
+        dest: /home/student/.ssh/authorized_keys
+        owner: student
+        group: student
+        mode: '0600'
 
     - name: Ensure correct ownership of student .ssh directory
       ansible.builtin.file:

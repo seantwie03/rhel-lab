@@ -56,6 +56,8 @@ VMS = [
 ]
 
 Vagrant.configure("2") do |config|
+		config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
 	# Check if the ISO path has been updated.
 	if RHEL_ISO_PATH == "/path/to/your/rhel-9.3-x86_64-dvd.iso"
 		raise "Please update the RHEL_ISO_PATH variable in your Vagrantfile before running 'vagrant up'."
@@ -97,7 +99,18 @@ Vagrant.configure("2") do |config|
 					vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", i+1, "--device", "0", "--type", "hdd", "--medium", disk_path]
 				end
 
-				# UDEV rules are now handled by the Ansible provisioner.
+				# Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
+				# This section uses udev to create symlinks so that the drives can be accessed
+				# using either sd[a-z] OR vd[a-z].
+				node.vm.provision "shell", inline: <<-SHELL
+					cat > /etc/udev/rules.d/99-persistent-disk.rules <<-'EOF'
+						KERNEL=="sda", SYMLINK+="vda"
+						KERNEL=="sdb", SYMLINK+="vdb"
+						KERNEL=="sdc", SYMLINK+="vdc"
+						KERNEL=="sdd", SYMLINK+="vdd"
+					EOF
+					udevadm trigger
+				SHELL
 			end
 
 			# Configure Libvirt provider settings
@@ -149,7 +162,7 @@ Vagrant.configure("2") do |config|
 				dnf config-manager --enable dvd-baseos,dvd-appstream > /dev/null
 				dnf clean all > /dev/null
 
-				# Install Ansible
+								# Install Ansible
 				dnf install -y ansible-core
 			SHELL
 
@@ -160,7 +173,6 @@ Vagrant.configure("2") do |config|
 				ansible.extra_vars = {
 					:system_type => vm_config[:system_type],
 					:hostname => vm_config[:hostname],
-					:vagrant_provider => node.vm.provider_name.to_s,
 					:rha_labs_file_exists => File.exist?("rha-labs.tar.gz"),
 					:etc_hosts_entries => hosts_entry
 				}

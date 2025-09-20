@@ -4,11 +4,7 @@
 
   tasks:
     - name: Include common tasks
-      include_tasks: tasks/01_common.yml
-
-    - name: Include VirtualBox udev tasks
-      include_tasks: tasks/05-udev_vbox.yml
-      when: vagrant_provider == "virtualbox"
+      include_tasks: tasks/01-common.yml
 
     - name: Include graphical system tasks
       include_tasks: tasks/02-graphical.yml
@@ -23,10 +19,9 @@
       when: hostname == "workstation" and rha_labs_file_exists
 
   handlers:
-    - name: Trigger udev
-      ansible.builtin.command: udevadm trigger
-
     - name: Restart sshd
       ansible.builtin.service:
         name: sshd
         state: restarted
+    - name: Set graphical default target
+      ansible.builtin.command: systemctl set-default graphical.target

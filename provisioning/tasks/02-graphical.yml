@@ -4,23 +4,17 @@
     name: "@Server with GUI"
     exclude: gnome-tour
     state: present
-
-- name: Boot to GUI automatically
-  ansible.builtin.systemd:
-    name: graphical.target
-    enabled: yes
+  notify: Set graphical default target
 
 - name: Remove nomodeset from kernel command line if it exists
   ansible.builtin.command: grubby --update-kernel=ALL --remove-args=nomodeset
   changed_when: false
 
 - name: Disable 'System Not Registered' Nag message for student user
-  become: yes
-  become_user: student
   ansible.builtin.systemd:
     name: org.gnome.SettingsDaemon.Subscription.service
-    scope: user
     masked: yes
+    scope: global
 
 - name: Configure terminal to autostart for student
   block:
@@ -44,4 +38,4 @@
       ansible.builtin.lineinfile:
         path: /home/student/.config/autostart/org.gnome.Terminal.desktop
         regexp: '^Exec='
-        line: 'Exec=gnome-terminal --maximize'
+        line: 'Exec=gnome-terminal --preferences --maximize'
