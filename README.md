@@ -31,7 +31,21 @@ To use this repository perform the following steps on a Fedora or Enterprise Lin
 - [Install a Vagrant Provider](https://developer.hashicorp.com/vagrant/docs/providers). This repository has been tested with the [Libvirt](https://github.com/vagrant-libvirt/vagrant-libvirt) and [VirtualBox](https://www.virtualbox.org/) providers.
 - [Download the RHEL 9.3 DVD ISO image](https://developers.redhat.com/products/rhel/download#exploreotherredhatproducts). Place the ISO in a location that it will live at permanently.
 - Download this repository onto your local machine and change into the project directory.
-- Review and update the `RHEL_ISO_PATH` variable in the `Vagrantfile` as desired.
+    - Update the `RHEL_ISO_PATH` variable in the `Vagrantfile` with the full path to the ISO.
+
+### Red Hat Academy Labs
+
+By default, the Virtual Machines created by this repository do not have the Red Hat Academy (RHA) labs. 
+
+The RHA Labs have NOT been tested on these Virtual Machines. Some may work, some may not.
+
+If you want to test your luck you can extract the RHA Lab files and place them in this directory **before** running `vagrant up`.
+
+#### Extracting RHA Labs
+
+On the Workstation VM in the RHA Lab environment run the following command: `tar -cvf rha-labs.tar.gz .venv .grading`. Then download the rha-labs.tar.gz to your local machine and place it in the same folder as the Vagrantfile.
+
+If you do this correctly, the shell provisioner inside the Vagrantfile will extract the files to the student's account in the Workstation VM. You can then use the `lab` command the same as you use it in the RHA Lab environment. Be warned, the labs have **NOT** been tested on these VMs.
 
 ## Creating the Environment
 
