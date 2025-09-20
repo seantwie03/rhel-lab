@@ -1,8 +1,8 @@
 .logs/*
 *.retry
 *.vault
-collections/*
-!collections/requirements.yml
+**/collections/*
+!**/collections/requirements.yml
 
 # Installer logs
 pip-log.txt
@@ -21,3 +21,9 @@ build/
 *.tar*
 *.iso
 *.ISO
+*.img
+*.vdi
+*.vmdk
+*.vhd
+*.hdd
+*.qcow
