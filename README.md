@@ -48,7 +48,7 @@ If you want to test your luck try this:
 - Place `rha-labs.tar.gz` in the same folder as the Vagrantfile.
 - Run `vagrant up`
 
-If you do those steps correctly, the shell provisioner inside the Vagrantfile will extract the files to the student's account in the Workstation VM.
+If you do those steps correctly, the shell provisioner inside the Vagrantfile will extract the files to the student's account in the Workstation VM. You can then attempt to run the `lab` command the same way you run it in the RHA lab environment.
 
 ## Creating the Environment
 
