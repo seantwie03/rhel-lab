@@ -41,6 +41,7 @@ If you want to test your luck try this:
 
 - On the Workstation VM in the RHA Lab environment, run the following command: 
 
+        cd /home/student
         tar -cvf rha-labs.tar.gz .venv .grading
 
 - Download the `rha-labs.tar.gz` to your local workstation.
