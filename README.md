@@ -27,7 +27,7 @@ The VMs that are created are not subscribed to the Red Hat repositories, instead
 
 This repository has 3 branches. Each branch creates similar VMs, but they all use different techonlogy to do so.
 
-| Branch            | VM Creation      | VM Configuration        | Supported Hypervisors | Supported Operating Systems |
+| Branch            | VM Creation      | VM Configuration        | Hypervisors | Operating Systems |
 | ----------------- | ---------------- | ----------------------- | --------------- | ---------------- |
 | main              | Vagrant          | Vagrant Shell Provisioner | VirtualBox/Libvirt | Windows/Linux    |
 | ansible_kickstart | Ansible          | Kickstart               | Libvirt         | Linux            |
