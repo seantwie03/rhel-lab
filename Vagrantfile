@@ -73,8 +73,7 @@ Vagrant.configure("2") do |config|
 	VMS.each do |vm_config|
 		config.vm.define "#{vm_config[:hostname]}.lab.example.com" do |node|
 			node.vm.hostname = "#{vm_config[:hostname]}.lab.example.com"
-			node.vm.network "private_network", ip: vm_config[:ip], virtualbox__intnet: true
-
+			node.vm.network "private_network", ip: vm_config[:ip]
 			# Configure VirtualBox provider settings
 			node.vm.provider "virtualbox" do |vb|
 				vb.name = vm_config[:hostname]
@@ -185,6 +184,7 @@ Vagrant.configure("2") do |config|
 					echo "| REBOOT |"
 					echo "----------"
 				SHELL
+			end
 		end
 	end
 
