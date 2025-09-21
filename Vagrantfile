@@ -98,19 +98,6 @@ Vagrant.configure("2") do |config|
 					end
 					vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", i+1, "--device", "0", "--type", "hdd", "--medium", disk_path]
 				end
-
-				# Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
-				# This section uses udev to create symlinks so that the drives can be accessed
-				# using either sd[a-z] OR vd[a-z].
-				node.vm.provision "shell", inline: <<-SHELL
-					cat > /etc/udev/rules.d/99-persistent-disk.rules <<-'EOF'
-						KERNEL=="sda", SYMLINK+="vda"
-						KERNEL=="sdb", SYMLINK+="vdb"
-						KERNEL=="sdc", SYMLINK+="vdc"
-						KERNEL=="sdd", SYMLINK+="vdd"
-					EOF
-					udevadm trigger
-				SHELL
 			end
 
 			# Configure Libvirt provider settings
@@ -162,8 +149,24 @@ Vagrant.configure("2") do |config|
 				dnf config-manager --enable dvd-baseos,dvd-appstream > /dev/null
 				dnf clean all > /dev/null
 
-								# Install Ansible
+				echo "Install Ansible"
 				dnf install -y ansible-core
+			SHELL
+
+			# Red Hat Academy Lab scripts expect /dev/vd[a-z]. VirtualBox has /dev/sd[a-z].
+			# This section uses udev to create symlinks so that the drives can be accessed
+			# using either sd[a-z] OR vd[a-z].
+			node.vm.provision "shell", inline: <<-SHELL
+				if [ -b /dev/sda ]; then
+					echo "Configure /dev/vd[a-z] symlinks"
+					cat > /etc/udev/rules.d/99-persistent-disk.rules <<-'EOF'
+						KERNEL=="sda", SYMLINK+="vda"
+						KERNEL=="sdb", SYMLINK+="vdb"
+						KERNEL=="sdc", SYMLINK+="vdc"
+						KERNEL=="sdd", SYMLINK+="vdd"
+					EOF
+					udevadm trigger
+				fi
 			SHELL
 
 			# Provisioner 2: Run the main Ansible playbook
@@ -176,7 +179,12 @@ Vagrant.configure("2") do |config|
 					:rha_labs_file_exists => File.exist?("rha-labs.tar.gz"),
 					:etc_hosts_entries => hosts_entry
 				}
-			end
+	
+				node.vm.provision "custom_reboot", type: "shell", reboot: true, inline: <<-SHELL
+					echo "----------"
+					echo "| REBOOT |"
+					echo "----------"
+				SHELL
 		end
 	end
 
