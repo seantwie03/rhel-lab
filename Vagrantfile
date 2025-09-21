@@ -56,8 +56,6 @@ VMS = [
 ]
 
 Vagrant.configure("2") do |config|
-		config.vm.synced_folder ".", "/vagrant", type: "rsync"
-
 	# Check if the ISO path has been updated.
 	if RHEL_ISO_PATH == "/path/to/your/rhel-9.3-x86_64-dvd.iso"
 		raise "Please update the RHEL_ISO_PATH variable in your Vagrantfile before running 'vagrant up'."
@@ -67,7 +65,6 @@ Vagrant.configure("2") do |config|
 	config.vm.box = "generic/rhel9"
 	config.vm.box_version = "4.3.12"
 	config.ssh.insert_key = false
-	
 
 	# Define and configure each VM based on the VMS data structure
 	VMS.each do |vm_config|
@@ -80,7 +77,7 @@ Vagrant.configure("2") do |config|
 				vb.cpus = vm_config[:cpus]
 				vb.memory = vm_config[:memory]
 
-				if vm_config[:hostname] == "workstation"
+				if vm_config[:system_type] == "graphical"
 					vb.gui = true
 					vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
 					#vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
@@ -115,6 +112,16 @@ Vagrant.configure("2") do |config|
 				end
 			end
 
+			# Copy this dir to /tmp/vagrant
+			node.vm.provision "shell", inline: <<-SHELL
+				mkdir -p /vagrant
+				chown vagrant:vagrant /vagrant
+				chmod 755 /vagrant
+			SHELL
+			node.vm.provision "file", source: "provisioning", destination: "/vagrant/"
+			if :system_type === "graphical" && File.exist?("rha-labs.tar.gz")
+				node.vm.provision "file", source: "rha-labs.tar.gz", destination: "/vagrant/"
+			end
 			node.vm.provision "file", source: "provisioning/files/lab_rsa", destination: "/tmp/lab_rsa"
 			node.vm.provision "file", source: "provisioning/files/lab_rsa.pub", destination: "/tmp/lab_rsa.pub"
 
@@ -172,10 +179,11 @@ Vagrant.configure("2") do |config|
 			hosts_entry = VMS.map { |vm| "#{vm[:ip]} #{vm[:hostname]}.lab.example.com #{vm[:hostname]}" }.join("\n")
 			node.vm.provision "ansible_local" do |ansible|
 				ansible.playbook = "provisioning/main.yml"
+				ansible.compatibility_mode = "2.0"
 				ansible.extra_vars = {
 					:system_type => vm_config[:system_type],
 					:hostname => vm_config[:hostname],
-					:rha_labs_file_exists => File.exist?("rha-labs.tar.gz"),
+					:rha_labs_file_exists => :system_type == "graphical" && File.exist?("rha-labs.tar.gz"),
 					:etc_hosts_entries => hosts_entry
 				}
 	
