@@ -26,7 +26,7 @@ The VMs that are created are not subscribed to the Red Hat repositories, instead
 To use this repository perform the following steps on a Fedora or Enterprise Linux distribution:
 
 - [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible).
-- [Download the RHEL 9.3 DVD ISO image](https://developers.redhat.com/products/rhel/download#exploreotherredhatproducts). Place the ISO in a location that it will live at permanently.
+- [Download the RHEL 9.3 DVD ISO image](https://access.redhat.com/downloads/content/479/ver=/rhel---9/9.3/x86_64/product-software). Make sure you download the Binary DVD that is 9.8GB. (Requires Developer Subscription). Place the ISO in a location that it will live at permanently.
 - Download this repository onto your local machine and change into the project directory.
 - Review and update the variables in [vars/rhel_lab_vars.yml](vars/rhel_lab_vars.yml) as desired. Especially update the **user_name**, **os_variant**, and **iso_path** variables.
 - Run `ansible-galaxy install -r collections/requirements.yml` to install the [community.libvirt collection](https://galaxy.ansible.com/ui/repo/published/community/libvirt/)

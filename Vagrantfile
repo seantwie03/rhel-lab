@@ -13,7 +13,7 @@
 #    More details here: https://www.virtualbox.org/manual/ch06.html#network_hostonly
 #
 
-RHEL_ISO_PATH = "/var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso"
+RHEL_ISO_PATH = "E:/ISOs/rhel-9.3-x86_64-dvd.iso"
 
 # Define all VMs in a single data structure for easy management.
 VMS = [
@@ -56,11 +56,6 @@ VMS = [
 ]
 
 Vagrant.configure("2") do |config|
-	# Check if the ISO path has been updated.
-	if RHEL_ISO_PATH == "/path/to/your/rhel-9.3-x86_64-dvd.iso"
-		raise "Please update the RHEL_ISO_PATH variable in your Vagrantfile before running 'vagrant up'."
-	end
-
 	# Common configuration for all VMs
 	config.vm.box = "generic/rhel9"
 	config.vm.box_version = "4.3.12"
