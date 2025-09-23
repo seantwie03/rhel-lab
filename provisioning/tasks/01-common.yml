@@ -46,15 +46,19 @@
 
 - name: Configure SSH daemon
   block:
-    - name: Allow root login and password authentication
+    - name: Allow root login
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '^#?{{ item.key }}'
-        line: '{{ item.key }} {{ item.value }}'
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin yes'
         state: present
-      loop:
-        - { key: 'PermitRootLogin', value: 'yes' }
-        - { key: 'PasswordAuthentication', value: 'yes' }
+      notify: Restart sshd
+
+    - name: Allow password authentication
+      ansible.builtin.replace:
+        path: /etc/ssh/sshd_config
+        regexp: '^(#\s*)?PasswordAuthentication\s+.*'
+        replace: 'PasswordAuthentication yes'
       notify: Restart sshd
 
 - name: Flush handlers to restart sshd if needed

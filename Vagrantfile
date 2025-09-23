@@ -13,7 +13,8 @@
 #    More details here: https://www.virtualbox.org/manual/ch06.html#network_hostonly
 #
 
-RHEL_ISO_PATH = "E:/ISOs/rhel-9.3-x86_64-dvd.iso"
+#RHEL_ISO_PATH = "E:/ISOs/rhel-9.3-x86_64-dvd.iso"
+RHEL_ISO_PATH = "/var/lib/libvirt/isos/rhel-9.3-x86_64-dvd.iso"
 
 # Define all VMs in a single data structure for easy management.
 VMS = [
@@ -114,7 +115,7 @@ Vagrant.configure("2") do |config|
 				chmod 755 /vagrant
 			SHELL
 			node.vm.provision "file", source: "provisioning", destination: "/vagrant/"
-			if :system_type === "graphical" && File.exist?("rha-labs.tar.gz")
+			if vm_config[:system_type] == "graphical" && File.exist?("rha-labs.tar.gz")
 				node.vm.provision "file", source: "rha-labs.tar.gz", destination: "/vagrant/"
 			end
 			node.vm.provision "file", source: "provisioning/files/lab_rsa", destination: "/tmp/lab_rsa"
@@ -178,7 +179,7 @@ Vagrant.configure("2") do |config|
 				ansible.extra_vars = {
 					:system_type => vm_config[:system_type],
 					:hostname => vm_config[:hostname],
-					:rha_labs_file_exists => :system_type == "graphical" && File.exist?("rha-labs.tar.gz"),
+					:rha_labs_file_exists => vm_config[:system_type] == "graphical" && File.exist?("rha-labs.tar.gz"),
 					:etc_hosts_entries => hosts_entry
 				}
 	
