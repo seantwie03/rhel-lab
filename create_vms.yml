@@ -222,5 +222,6 @@
                 Hostname {{ item.hostname }}.lab.example.com
                 User root
                 IdentityFile ~/.ssh/lab_rsa
+                StrictHostKeyChecking no
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
           loop: "{{ graphical_workstations }}"
