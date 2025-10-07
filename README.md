@@ -6,7 +6,9 @@ This repo contains playbooks to install and setup several Virtual Machines that 
 
 This lab environment is loosely based off of the [Red Hat Academy](https://www.redhat.com/en/services/training/red-hat-academy) lab environment for the [RHCSA](https://www.redhat.com/en/services/certification/rhcsa) and [RHCE](https://www.redhat.com/en/services/certification/rhce) courses.
 
-**Hypervisor**: Libvirt
+**Hypervisor**: [Libvirt](https://libvirt.org/)
+
+**VM Manager**: [Ansible](https://docs.ansible.com/)
 
 **VM Configuration**: [kickstart](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/automatically_installing_rhel/automated-installation-workflow)
 
@@ -21,6 +23,17 @@ This lab environment is loosely based off of the [Red Hat Academy](https://www.r
 
 The VMs that are created are not subscribed to the Red Hat repositories, instead the DVD ISO is mounted into the VM and configured as a repository. This enables package installation without a subscription. If you wish to subscribe the VMs consider creating an account and joining the [developer program](https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux).
 
+### Options
+
+This repository has a few branches. Each branch will create the lab environment described above, but they use different techonlogy to do so. If you don't care which underlying technology is used, stick with the `main` branch.
+
+| Branch            | VM Creation      | VM Configuration        | Hypervisors | Operating Systems |
+| ----------------- | ---------------- | ----------------------- | --------------- | ---------------- |
+| [main](https://github.com/seantwie03/rhel-lab/tree/main?tab=readme-ov-file) | Vagrant          | Vagrant Shell Provisioner | VirtualBox/Libvirt | Windows/Linux    |
+| [ansible_kickstart](https://github.com/seantwie03/rhel-lab/tree/ansible_kickstart?tab=readme-ov-file) | Ansible          | Kickstart               | Libvirt         | Linux            |
+| [vagrant_ansible](https://github.com/seantwie03/rhel-lab/tree/vagrant_ansible?tab=readme-ov-file) | Vagrant          | Ansible Local Provisioner | VirtualBox/Libvirt | Windows/Linux    |
+
+
 ## Setup
 
 To use this repository perform the following steps on a Fedora or Enterprise Linux distribution:
@@ -31,6 +44,22 @@ To use this repository perform the following steps on a Fedora or Enterprise Lin
 - Review and update the variables in [vars/rhel_lab_vars.yml](vars/rhel_lab_vars.yml) as desired. Especially update the **user_name**, **os_variant**, and **iso_path** variables.
 - Run `ansible-galaxy install -r collections/requirements.yml` to install the [community.libvirt collection](https://galaxy.ansible.com/ui/repo/published/community/libvirt/)
 
+### Red Hat Academy Labs
+
+The Virtual Machines created by this repository may work for some of the Red Hat Academy (RHA) labs. Supporting the RHA labs is outside of the scope of this project. If you want to try running the RHA labs you can, but it has not been tested and is certainly not garunteed to work.
+
+If you want to test your luck try this:
+
+- On the Workstation VM in the RHA Lab environment, run the following command: 
+
+      cd /home/student
+      tar -cvf rha-labs.tar.gz .venv .grading
+
+- Download the `rha-labs.tar.gz` to your local workstation.
+- Place `rha-labs.tar.gz` in the same directory as the create_vms.yml file
+- Run `ansible-playbook --ask-become-pass create_vms.yml`
+
+If you do these steps correctly, the kickstart file will extract the files to the student's account in the Workstation VM. You can then attempt to run the `lab` command the same way you run it in the RHA lab environment.
 
 ## Creating the Environment
 
@@ -43,11 +72,11 @@ This playbook performs the following actions:
 - Creates 172.25.250.0/24 network (lab-example-com).
 - Creates virtual machines described above.
 - Configures virtual machines using kickstart files.
-- Configures your host for easy access to the lab environment.
+- Configures your ssh config and hosts files for easy access to the lab environment.
 
 After the playbook completes the VMs will still be installing via Kickstart. Wait for them to automatically shut off.
 
-After the VMs shut down it is recommend to take a snapshot of each one with a command like the following:
+After the VMs shut down it is recommend to power them on and take a snapshot of each one with a command like the following:
 
 ```sh
 sudo virsh snapshot-create-as workstation "$(date --iso-8601=seconds) - fresh install"
