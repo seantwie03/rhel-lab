@@ -16,12 +16,24 @@
           failed_when: false
           loop: "{{ graphical_workstations }}"
 
-        - name: Undefine the graphical workstation virtual machines
-          community.libvirt.virt:
-            name: "{{ item.hostname }}"
-            command: undefine
-            force: true
+        - name: Get all snapshots for the graphical workstation
+          ansible.builtin.command: virsh snapshot-list {{ item.hostname }} --name
+          register: workstation_snapshots
+          changed_when: false
+          failed_when: false
           loop: "{{ graphical_workstations }}"
+
+        - name: Delete all snapshots for the graphical workstation
+          ansible.builtin.command: virsh snapshot-delete {{ item.0.item.hostname }} {{ item.1 }}
+          loop: "{{ workstation_snapshots.results | subelements('stdout_lines') }}"
+          failed_when: false
+
+        #- name: Undefine the graphical workstation virtual machines
+        #  community.libvirt.virt:
+        #    name: "{{ item.hostname }}"
+        #    command: undefine
+        #    force: true
+        #  loop: "{{ graphical_workstations }}"
 
         - name: Find all storage drives for graphical workstations
           ansible.builtin.find:
@@ -52,6 +64,18 @@
             command: shutdown
           failed_when: false
           loop: "{{ headless_servers }}"
+
+        - name: Get all snapshots for the headless server
+          ansible.builtin.command: virsh snapshot-list {{ item.hostname }} --name
+          register: server_snapshots
+          changed_when: false
+          failed_when: false
+          loop: "{{ headless_servers }}"
+
+        - name: Delete all snapshots for the headless server
+          ansible.builtin.command: virsh snapshot-delete {{ item.0.item.hostname }} {{ item.1 }}
+          loop: "{{ server_snapshots.results | subelements('stdout_lines') }}"
+          failed_when: false
 
         - name: Undefine the headless server virtual machines
           community.libvirt.virt:
@@ -118,28 +142,29 @@
 
         - name: Remove SSH config for headless servers
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             state: absent
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
           loop: "{{ headless_servers }}"
 
         - name: Remove SSH config for root access to headless servers
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             state: absent
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
           loop: "{{ headless_servers }}"
 
         - name: Remove SSH config for graphical workstations
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             state: absent
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
           loop: "{{ graphical_workstations }}"
 
         - name: Remove SSH config for root access to graphical workstations
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             state: absent
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
           loop: "{{ headless_servers }}"
+
