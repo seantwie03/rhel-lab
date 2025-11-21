@@ -54,7 +54,7 @@
             state: directory
             owner: root
             group: qemu
-            mode: "0755"
+            mode: 0755
             setype: virt_content_t
 
         - name: Template graphical workstation kickstart files
@@ -63,7 +63,7 @@
             dest: /var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
             owner: root
             group: qemu
-            mode: "0644"
+            mode: 0644
             setype: virt_content_t
           loop: "{{ graphical_workstations }}"
 
@@ -73,7 +73,7 @@
             dest: /var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
             owner: root
             group: qemu
-            mode: "0644"
+            mode: 0644
             setype: virt_content_t
           loop: "{{ headless_servers }}"
 
@@ -90,7 +90,7 @@
               --ram=6000
               --network network=lab-example-com
               --disk {{ iso_path }},device=cdrom,readonly=on
-              --disk path=/var/lib/libvirt/images/{{ item.hostname }}-os.qcow2,size=20,boot.order=1
+              --disk pool=images,size=20,format=qcow2,boot_order=1
               --location {{ iso_path }}
               --initrd-inject=/var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
               --extra-args="inst.ks=file:ks-{{ item.hostname }}.cfg"
@@ -111,10 +111,10 @@
               --ram=2048
               --network network=lab-example-com
               --disk {{ iso_path }},device=cdrom,readonly=on
-              --disk path=/var/lib/libvirt/images/{{ item.hostname }}-os.qcow2,size=10,boot.order=1
-              --disk path=/var/lib/libvirt/images/{{ item.hostname }}-1.qcow2,size=5,boot.order=2
-              --disk path=/var/lib/libvirt/images/{{ item.hostname }}-2.qcow2,size=5,boot.order=3
-              --disk path=/var/lib/libvirt/images/{{ item.hostname }}-3.qcow2,size=5,boot.order=4
+              --disk pool=images,size=10,format=qcow2,boot_order=1
+              --disk pool=images,size=5,format=qcow2,boot_order=2
+              --disk pool=images,size=5,format=qcow2,boot_order=3
+              --disk pool=images,size=5,format=qcow2,boot_order=4
               --location {{ iso_path }}
               --initrd-inject=/var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
               --extra-args="inst.ks=file:ks-{{ item.hostname }}.cfg"
@@ -142,33 +142,33 @@
 
         - name: Ensure .ssh directory exists
           ansible.builtin.file:
-            path: "/home/{{ user_name }}/.ssh"
+            path: /home/{{ user_name }}/.ssh
             state: directory
-            mode: "0700"
+            mode: 0700
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
 
         - name: Copy lab_rsa.pub key
           ansible.builtin.copy:
             src: files/lab_rsa.pub
-            dest: "/home/{{ user_name }}/.ssh/lab_rsa.pub"
-            mode: "0600"
+            dest: /home/{{ user_name }}/.ssh/lab_rsa.pub
+            mode: 0600
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
 
         - name: Copy lab_rsa key
           ansible.builtin.copy:
             src: files/lab_rsa
-            dest: "/home/{{ user_name }}/.ssh/lab_rsa"
-            mode: "0600"
+            dest: /home/{{ user_name }}/.ssh/lab_rsa
+            mode: 0600
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
 
         - name: Create SSH config for headless servers
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             create: true
-            mode: "0600"
+            mode: 0600
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
             block: |
@@ -182,9 +182,9 @@
 
         - name: Create SSH config for root access to headless servers
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             create: true
-            mode: "0600"
+            mode: 0600
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
             block: |
@@ -192,14 +192,15 @@
                 Hostname {{ item.hostname }}.lab.example.com
                 User root
                 IdentityFile ~/.ssh/lab_rsa
+                StrictHostKeyChecking no
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
           loop: "{{ headless_servers }}"
 
         - name: Create SSH config for graphical workstations
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             create: true
-            mode: "0600"
+            mode: 0600
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
             block: |
@@ -207,14 +208,15 @@
                 Hostname {{ item.hostname }}.lab.example.com
                 User student
                 IdentityFile ~/.ssh/lab_rsa
+                StrictHostKeyChecking no
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }}"
           loop: "{{ graphical_workstations }}"
 
         - name: Create SSH config for root access to graphical workstations
           ansible.builtin.blockinfile:
-            path: "/home/{{ user_name }}/.ssh/config"
+            path: /home/{{ user_name }}/.ssh/config
             create: true
-            mode: "0600"
+            mode: 0600
             owner: "{{ user_name }}"
             group: "{{ user_name }}"
             block: |
@@ -225,3 +227,4 @@
                 StrictHostKeyChecking no
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
           loop: "{{ graphical_workstations }}"
+

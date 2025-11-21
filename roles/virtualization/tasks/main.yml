@@ -11,13 +11,13 @@
     append: true
   loop: "{{ libvirt_users }}"
 
-- name: Create directory for ISOs
+- name: Images directory is accessible to wheel group
   ansible.builtin.file:
-    path: /var/lib/libvirt/isos
+    path: /var/lib/libvirt/images
     state: directory
     owner: root
     group: wheel
-    mode: "0775"
+    mode: 0775
 
 - name: Ensure community.libvirt prerequisites are installed
   ansible.builtin.package:
@@ -25,3 +25,4 @@
       - python3-libvirt
       - python3-lxml
     state: present
+

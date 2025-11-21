@@ -1,4 +1,4 @@
-Role Name
+Virtualization
 =========
 
 Install Virtualization Tools included in '@virtualization' group and add users to libvirt group.
@@ -6,7 +6,7 @@ Install Virtualization Tools included in '@virtualization' group and add users t
 Requirements
 ------------
 
-DNF, Become
+Become
 
 
 Role Variables
