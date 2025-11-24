@@ -2,7 +2,9 @@
 #
 # Use graphical install
 graphical
+
 repo --name="AppStream" --baseurl=file:///run/install/sources/mount-0000-cdrom/AppStream
+#repo --name="AppStream" --baseurl=file:///run/install/repo/AppStream # from RHEL10 auto-generated ks
 
 %addon com_redhat_kdump --enable --reserve-mb='auto'
 
@@ -18,7 +20,7 @@ network  --bootproto=static --device=enp1s0 --gateway=172.25.250.1 --ip={{ item.
 network  --hostname={{ item.hostname }}.lab.example.com
 
 # Use CDROM installation media
-cdrom
+cdrom # This is not in rhel10 auto-generated ks
 
 {% if item.system_type == 'graphical' %}
 
