@@ -39,28 +39,11 @@ This repository has a few branches. Each branch will create the lab environment 
 To use this repository perform the following steps on a Fedora or Enterprise Linux distribution:
 
 - [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible).
-- [Download the RHEL 9.3 DVD ISO image](https://developers.redhat.com/products/rhel/download#exploreotherredhatproducts). Place the ISO in a location that it will live at permanently.
+- [Download the RHEL 10.0 DVD ISO image](https://developers.redhat.com/products/rhel/download#exploreotherredhatproducts). Place the ISO in a location that it will live at permanently.
 - Download this repository onto your local machine and change into the project directory.
 - Review and update the variables in [vars/rhel_lab_vars.yml](vars/rhel_lab_vars.yml) as desired. Especially update the **user_name** and **iso_path** variables.
 - Run `ansible-galaxy install -r collections/requirements.yml` to install the [community.libvirt collection](https://galaxy.ansible.com/ui/repo/published/community/libvirt/)
 - Run the `create_vms.yml` playbook: `ansible-playbook create_vms.yml --ask-become-pass`
-
-### Red Hat Academy Labs
-
-The Virtual Machines created by this repository may work for some of the Red Hat Academy (RHA) labs. Supporting the RHA labs is outside of the scope of this project. If you want to try running the RHA labs you can, but it has not been tested and is certainly not garunteed to work.
-
-If you want to test your luck try this:
-
-- On the Workstation VM in the RHA Lab environment, run the following command: 
-
-      cd /home/student
-      tar -cvf rha-labs.tar.gz .venv .grading
-
-- Download the `rha-labs.tar.gz` to your local workstation.
-- Place `rha-labs.tar.gz` in the same directory as the create_vms.yml file
-- Run `ansible-playbook --ask-become-pass create_vms.yml`
-
-If you do these steps correctly, the kickstart file will extract the files to the student's account in the Workstation VM. You can then attempt to run the `lab` command the same way you run it in the RHA lab environment.
 
 ## Creating the Environment
 
@@ -80,10 +63,10 @@ After the playbook completes the VMs will still be installing via Kickstart. Wai
 After the VMs shut down it is recommend to power them so that the host keys are generated, then take a snapshot of each one with a command like the following:
 
 ```sh
-sudo virsh snapshot-create-as workstation "$(date --iso-8601=seconds) - fresh install"
-sudo virsh snapshot-create-as servera "$(date --iso-8601=seconds) - fresh install"
-sudo virsh snapshot-create-as serverb "$(date --iso-8601=seconds) - fresh install"
-sudo virsh snapshot-create-as serverc "$(date --iso-8601=seconds) - fresh install"
+sudo virsh snapshot-create-as workstation "$(date --iso-8601=seconds)-fresh_install"
+sudo virsh snapshot-create-as servera "$(date --iso-8601=seconds)-fresh_install"
+sudo virsh snapshot-create-as serverb "$(date --iso-8601=seconds)-fresh_install"
+sudo virsh snapshot-create-as serverc "$(date --iso-8601=seconds)-fresh_install"
 ```
 
 The lab environment is now created and ready for use. If you wish to modify the lab environment, use the methods described in the [RHEL Documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_and_managing_linux_virtual_machines/index). Do not attempt to update the VMs by re-running the `create_vms.yml` playbook. This playbook is **NOT idempotent.** Running the `create_vms.yml` playbook a second time is likely to cause problems. If you want to undo the changes from `create_vms.yml` you can run `ansible-playbook --ask-become-pass destroy_vms.yml`. This will undo all changes from `create_vms.yml` except it will not remove libvirt from your host.

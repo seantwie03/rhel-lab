@@ -3,15 +3,12 @@
 # Use graphical install
 graphical
 
-repo --name="AppStream" --baseurl=file:///run/install/sources/mount-0000-cdrom/AppStream
-#repo --name="AppStream" --baseurl=file:///run/install/repo/AppStream # from RHEL10 auto-generated ks
-
 %addon com_redhat_kdump --enable --reserve-mb='auto'
 
 %end
 
 # Keyboard layouts
-keyboard --xlayouts='us'
+keyboard --vckeymap=us --xlayouts='us'
 # System language
 lang en_US.UTF-8
 
@@ -19,8 +16,7 @@ lang en_US.UTF-8
 network  --bootproto=static --device=enp1s0 --gateway=172.25.250.1 --ip={{ item.ip }} --nameserver=172.25.250.1 --netmask=255.255.255.0 --ipv6=auto --activate
 network  --hostname={{ item.hostname }}.lab.example.com
 
-# Use CDROM installation media
-cdrom # This is not in rhel10 auto-generated ks
+repo --name="AppStream" --baseurl=file:///run/install/repo/AppStream
 
 {% if item.system_type == 'graphical' %}
 
@@ -62,7 +58,7 @@ timezone Etc/UTC --utc
 
 # Root password
 rootpw --allow-ssh redhat
-user --groups=wheel --name=student --password=student --gecos="Student"
+user --groups=wheel --name=student --password=student --gecos="Student User"
 
 # System services
 firewall --enabled --service=ssh
@@ -89,6 +85,8 @@ enabled=1
 gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 EOF
+
+rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
 
 {% if item.system_type == 'graphical' %}
 

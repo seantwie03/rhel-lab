@@ -28,12 +28,12 @@
           loop: "{{ workstation_snapshots.results | subelements('stdout_lines') }}"
           failed_when: false
 
-        #- name: Undefine the graphical workstation virtual machines
-        #  community.libvirt.virt:
-        #    name: "{{ item.hostname }}"
-        #    command: undefine
-        #    force: true
-        #  loop: "{{ graphical_workstations }}"
+        - name: Undefine the graphical workstation virtual machines
+          community.libvirt.virt:
+            name: "{{ item.hostname }}"
+            command: undefine
+            force: true
+          loop: "{{ graphical_workstations }}"
 
         - name: Find all storage drives for graphical workstations
           ansible.builtin.find:
@@ -134,6 +134,11 @@
             regexp: ^{{ item.ip }}|\s{{ item.hostname }}
             state: absent
           loop: "{{ graphical_workstations }}"
+
+        - name: Remove rhel lab public key
+          ansible.builtin.file:
+            dest: "/home/{{ user_name }}/.ssh/lab_rsa.pub"
+            state: absent
 
         - name: Remove rhel lab key
           ansible.builtin.file:

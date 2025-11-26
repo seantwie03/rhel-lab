@@ -6,18 +6,9 @@
 
 - name: Ensure libvirt_users are in the libvirt group
   ansible.builtin.user:
-    name: "{{ item }}"
+    name: "{{ user_name }}"
     groups: libvirt
     append: true
-  loop: "{{ libvirt_users }}"
-
-- name: Images directory is accessible to wheel group
-  ansible.builtin.file:
-    path: /var/lib/libvirt/images
-    state: directory
-    owner: root
-    group: wheel
-    mode: 0775
 
 - name: Ensure community.libvirt prerequisites are installed
   ansible.builtin.package:
