@@ -60,14 +60,7 @@ This playbook performs the following actions:
 
 After the playbook completes the VMs will still be installing via Kickstart. Wait for them to automatically shut off.
 
-After the VMs shut down it is recommend to power them so that the host keys are generated, then take a snapshot of each one with a command like the following:
-
-```sh
-sudo virsh snapshot-create-as workstation "$(date --iso-8601=seconds)-fresh_install"
-sudo virsh snapshot-create-as servera "$(date --iso-8601=seconds)-fresh_install"
-sudo virsh snapshot-create-as serverb "$(date --iso-8601=seconds)-fresh_install"
-sudo virsh snapshot-create-as serverc "$(date --iso-8601=seconds)-fresh_install"
-```
+After the VMs shut down it is recommend to power them so that the host keys are generated, then take a snapshot of each one.
 
 The lab environment is now created and ready for use. If you wish to modify the lab environment, use the methods described in the [RHEL Documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_and_managing_linux_virtual_machines/index). Do not attempt to update the VMs by re-running the `create_vms.yml` playbook. This playbook is **NOT idempotent.** Running the `create_vms.yml` playbook a second time is likely to cause problems. If you want to undo the changes from `create_vms.yml` you can run `ansible-playbook --ask-become-pass destroy_vms.yml`. This will undo all changes from `create_vms.yml` except it will not remove libvirt from your host.
 
