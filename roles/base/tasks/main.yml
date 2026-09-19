@@ -1,0 +1,129 @@
+---
+- name: Ensure convenience packages are installed
+  ansible.builtin.package:
+    name:
+      - bash-completion
+      - man-pages
+      - man-db
+      - plocate
+    state: present
+  notify:
+    - "Update mandb"
+    - "Update locate"
+
+- name: Copy terminfo
+  block:
+    - name: Copy terminfo - ghostty
+      ansible.builtin.copy:
+        src: terminfo/g/ghostty
+        dest: /usr/share/terminfo/g/ghostty
+        owner: root
+        group: root
+        directory_mode: '755'
+        mode: '644'
+
+    - name: Copy terminfo - xterm-ghostty
+      ansible.builtin.copy:
+        src: terminfo/g/ghostty
+        dest: /usr/share/terminfo/x/xterm-ghostty
+        owner: root
+        group: root
+        directory_mode: '755'
+        mode: '644'
+
+    - name: Copy terminfo - kitty
+      ansible.builtin.copy:
+        src: terminfo/k/kitty
+        dest: /usr/share/terminfo/k/kitty
+        owner: root
+        group: root
+        directory_mode: '755'
+        mode: '644'
+
+    - name: Copy terminfo - xterm-kitty
+      ansible.builtin.copy:
+        src: terminfo/k/kitty
+        dest: /usr/share/terminfo/x/xterm-kitty
+        owner: root
+        group: root
+        directory_mode: '755'
+        mode: '644'
+
+- name: Ensure udev disk symlinks are configured
+  ansible.builtin.copy:
+    src: udev/99-persistent-disk.rules
+    dest: /etc/udev/rules.d/99-persistent-disk.rules
+    owner: root
+    group: root
+    mode: '644'
+  notify: Trigger udev
+
+- name: Ensure Vim is installed and configured for all users
+  block:
+    - name: Ensure vim is installed
+      ansible.builtin.package:
+        name: vim
+        state: present
+
+    - name: Ensure vimrc is configured for root
+      ansible.builtin.copy:
+        src: vimrc
+        dest: /root/.vimrc
+        owner: root
+        group: root
+        mode: '644'
+
+    - name: Ensure vim is configured for root
+      ansible.builtin.copy:
+        src: vim/
+        dest: /root/.config/vim
+        owner: root
+        group: root
+        directory_mode: '755'
+        mode: '644'
+
+    - name: Ensure vimrc is configured for existing users
+      ansible.builtin.copy:
+        src: vimrc
+        dest: /home/{{ item }}/.vimrc
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        mode: '644'
+      loop:
+        - student
+
+    - name: Ensure vim is configured for existing users
+      ansible.builtin.copy:
+        src: vim/
+        dest: /home/{{ item }}/.config/vim
+        owner: "{{ item }}"
+        group: "{{ item }}"
+        directory_mode: '755'
+        mode: '644'
+      loop:
+        - student
+
+    - name: Ensure vimrc is configured for any future users
+      ansible.builtin.copy:
+        src: vimrc
+        dest: /etc/skel/.vimrc
+        owner: root
+        group: root
+        mode: '644'
+
+    - name: Ensure .config exists in /etc/skel
+      ansible.builtin.file:
+        path: /etc/skel/.config
+        state: directory
+        owner: root
+        group: root
+        mode: '755'
+
+    - name: Ensure vim is configured for any future users
+      ansible.builtin.copy:
+        src: vim/
+        dest: /etc/skel/.config/vim
+        owner: root
+        group: root
+        directory_mode: '755'
+        mode: '644'

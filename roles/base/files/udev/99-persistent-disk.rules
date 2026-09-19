@@ -1,0 +1,29 @@
+# KVM uses /dev/vd[a-z]. Demos and students use /dev/sd[a-z].
+# Create symlinks so drives are accessible via either vd[a-z] or sd[a-z].
+KERNEL=="vda", SYMLINK+="sda"
+KERNEL=="vda1", SYMLINK+="sda1"
+KERNEL=="vda2", SYMLINK+="sda2"
+KERNEL=="vda3", SYMLINK+="sda3"
+KERNEL=="vda4", SYMLINK+="sda4"
+KERNEL=="vda5", SYMLINK+="sda5"
+
+KERNEL=="vdb", SYMLINK+="sdb"
+KERNEL=="vdb1", SYMLINK+="sdb1"
+KERNEL=="vdb2", SYMLINK+="sdb2"
+KERNEL=="vdb3", SYMLINK+="sdb3"
+KERNEL=="vdb4", SYMLINK+="sdb4"
+KERNEL=="vdb5", SYMLINK+="sdb5"
+
+KERNEL=="vdc", SYMLINK+="sdc"
+KERNEL=="vdc1", SYMLINK+="sdc1"
+KERNEL=="vdc2", SYMLINK+="sdc2"
+KERNEL=="vdc3", SYMLINK+="sdc3"
+KERNEL=="vdc4", SYMLINK+="sdc4"
+KERNEL=="vdc5", SYMLINK+="sdc5"
+
+KERNEL=="vdd", SYMLINK+="sdd"
+KERNEL=="vdd1", SYMLINK+="sdd1"
+KERNEL=="vdd2", SYMLINK+="sdd2"
+KERNEL=="vdd3", SYMLINK+="sdd3"
+KERNEL=="vdd4", SYMLINK+="sdd4"
+KERNEL=="vdd5", SYMLINK+="sdd5"

@@ -1,0 +1,18 @@
+---
+all:
+  vars:
+    ansible_user: root
+    ansible_ssh_private_key_file: ~/.ssh/lab_rsa
+  children:
+    graphical_workstations:
+      hosts:
+        workstation:
+          ansible_host: 172.25.250.9
+    headless_servers:
+      hosts:
+        servera:
+          ansible_host: 172.25.250.10
+        serverb:
+          ansible_host: 172.25.250.11
+        serverc:
+          ansible_host: 172.25.250.12

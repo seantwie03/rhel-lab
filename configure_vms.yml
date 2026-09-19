@@ -1,0 +1,7 @@
+---
+- name: Apply base configuration to lab VMs
+  hosts: all
+  remote_user: root
+
+  roles:
+    - role: base

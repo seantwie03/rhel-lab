@@ -1,0 +1,12 @@
+---
+- name: Trigger udev
+  ansible.builtin.command:
+    cmd: udevadm trigger
+
+- name: Update mandb
+  ansible.builtin.command:
+    cmd: mandb
+
+- name: Update locate
+  ansible.builtin.command:
+    cmd: updatedb

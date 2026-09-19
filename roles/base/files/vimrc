@@ -1,0 +1,64 @@
+filetype plugin on
+filetype indent off
+
+" Enable Line numbers
+set number
+
+" Tabs are four spaces
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+set expandtab
+
+" Sane splits
+set splitright
+set splitbelow
+
+" Show whitespace
+set list
+set listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·,space:·
+hi SpecialKey ctermfg=grey
+
+" Underline matching brackets without changing their colors
+highlight MatchParen term=underline cterm=underline ctermfg=NONE ctermbg=NONE gui=underline guifg=NONE guibg=NONE
+
+" Return to last edit position when opening files (You want this!)
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+" Keep view centered while scrolling and searching
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap n nzz
+nnoremap N Nzz
+nnoremap { {zz
+nnoremap } }zz
+
+" Y behaves like D, C, etc.
+nnoremap Y y$
+vnoremap Y $y
+
+" Switch windows
+nnoremap <c-j> <c-w><c-j>
+nnoremap <c-k> <c-w><c-k>
+nnoremap <c-h> <c-w><c-h>
+nnoremap <c-l> <c-w><c-l>
+
+" Ctrl-s - Save
+" This mapping works across Normal, Visual, and Command-line modes
+noremap <C-s> <Esc>:update<CR>
+" For Insert mode, a separate mapping is needed
+inoremap <C-s> <Esc>:update<CR>
+" Useful for remote control
+inoremap jj <Esc>
+
+set incsearch " Shows the match while typing
+" Clear search highlight immediately
+augroup ClearSearchHighlight
+    autocmd!
+    autocmd CmdlineLeave [/\?] set nohlsearch
+    autocmd BufWinEnter * set nohlsearch
+augroup END
+
+" Do not automatically insert comments on new lines
+" An autocmd is used so this setting does not get overridden by filetype plugins
+autocmd FileType * setlocal formatoptions-=r formatoptions-=o
