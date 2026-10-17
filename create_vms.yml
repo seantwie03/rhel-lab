@@ -85,9 +85,9 @@
               --os-variant={{ os_variant }}
               --vcpus=2
               --ram=6000
-              --network network=lab-example-com
+              --network network=lab-example-com,address.type=pci,address.bus=0,address.slot=8
               --disk {{ iso_path }},device=cdrom,readonly=on
-              --disk pool=default,size=20,format=qcow2,boot_order=1
+              --disk pool=default,size=20,format=qcow2,bus=sata,boot_order=1
               --location {{ iso_path }}
               --initrd-inject=/var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
               --extra-args="inst.ks=file:ks-{{ item.hostname }}.cfg"
@@ -106,12 +106,12 @@
               --os-variant={{ os_variant }}
               --vcpus=1
               --ram=2048
-              --network network=lab-example-com
+              --network network=lab-example-com,address.type=pci,address.bus=0,address.slot=8
               --disk {{ iso_path }},device=cdrom,readonly=on
-              --disk pool=default,size=10,format=qcow2,boot_order=1
-              --disk pool=default,size=5,format=qcow2,boot_order=2
-              --disk pool=default,size=5,format=qcow2,boot_order=3
-              --disk pool=default,size=5,format=qcow2,boot_order=4
+              --disk pool=default,size=10,format=qcow2,bus=sata,boot_order=1
+              --disk pool=default,size=5,format=qcow2,bus=sata,boot_order=2
+              --disk pool=default,size=5,format=qcow2,bus=sata,boot_order=3
+              --disk pool=default,size=5,format=qcow2,bus=sata,boot_order=4
               --location {{ iso_path }}
               --initrd-inject=/var/lib/libvirt/kickstarts/ks-{{ item.hostname }}.cfg
               --extra-args="inst.ks=file:ks-{{ item.hostname }}.cfg"

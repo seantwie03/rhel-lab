@@ -66,5 +66,5 @@
             path: /home/{{ user_name }}/.ssh/config
             state: absent
             marker: "# {mark} ANSIBLE MANAGED BLOCK FOR RHEL LAB - {{ item.hostname }} - root access"
-          loop: "{{ headless_servers }}"
+          loop: "{{ graphical_workstations }}"
 

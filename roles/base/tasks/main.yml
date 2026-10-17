@@ -49,15 +49,6 @@
         directory_mode: '755'
         mode: '644'
 
-- name: Ensure udev disk symlinks are configured
-  ansible.builtin.copy:
-    src: udev/99-persistent-disk.rules
-    dest: /etc/udev/rules.d/99-persistent-disk.rules
-    owner: root
-    group: root
-    mode: '644'
-  notify: Trigger udev
-
 - name: Ensure Vim is installed and configured for all users
   block:
     - name: Ensure vim is installed

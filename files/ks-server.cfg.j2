@@ -13,7 +13,7 @@ keyboard --vckeymap=us --xlayouts='us'
 lang en_US.UTF-8
 
 # Network information
-network  --bootproto=static --device=enp1s0 --gateway=172.25.250.1 --ip={{ item.ip }} --nameserver=172.25.250.1 --netmask=255.255.255.0 --ipv6=auto --activate
+network  --bootproto=static --device=enp0s8 --gateway=172.25.250.1 --ip={{ item.ip }} --nameserver=172.25.250.1 --netmask=255.255.255.0 --ipv6=auto --activate
 network  --hostname={{ item.hostname }}.lab.example.com
 
 repo --name="AppStream" --baseurl=file:///run/install/repo/AppStream
@@ -48,7 +48,7 @@ man-db
 firstboot --disable
 
 # Partitoning information
-ignoredisk --only-use=vda
+ignoredisk --only-use=sda
 autopart
 # Partition clearing information
 clearpart --none --initlabel
@@ -114,9 +114,12 @@ cat > /root/.ssh/authorized_keys << 'EOF'
 {{ rhel_lab_public_key }}
 EOF
 
+echo "Copying private key to lab_rsa for root user, matching the SCC lab"
+cp -v /root/.ssh/id_rsa /root/.ssh/lab_rsa
+
 chown -vR root:root /root/.ssh
 chmod -v 700 /root/.ssh
-chmod -v 600 /root/.ssh/id_rsa /root/.ssh/authorized_keys
+chmod -v 600 /root/.ssh/id_rsa /root/.ssh/lab_rsa /root/.ssh/authorized_keys
 
 echo "Configuring SSH key for student user"
 mkdir -vp /home/student/.ssh
@@ -132,9 +135,12 @@ cat > /home/student/.ssh/authorized_keys << 'EOF'
 {{ rhel_lab_public_key }}
 EOF
 
+echo "Copying private key to lab_rsa for student user, matching the SCC lab"
+cp -v /home/student/.ssh/id_rsa /home/student/.ssh/lab_rsa
+
 chown -vR student:student /home/student/.ssh
 chmod -v 700 /home/student/.ssh
-chmod -v 600 /home/student/.ssh/id_rsa /home/student/.ssh/authorized_keys
+chmod -v 600 /home/student/.ssh/id_rsa /home/student/.ssh/lab_rsa /home/student/.ssh/authorized_keys
 
 echo "Relaxing SSH host key checking"
 cat > /etc/ssh/ssh_config.d/host-key-checking.conf << 'EOF'
