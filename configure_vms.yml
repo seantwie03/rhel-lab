@@ -5,3 +5,4 @@
 
   roles:
     - role: base
+    - role: serial_console

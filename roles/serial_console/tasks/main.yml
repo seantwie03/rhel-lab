@@ -1,0 +1,71 @@
+---
+- name: Ensure GRUB2 uses the serial terminal
+  notify:
+    - "Regenerate grub.cfg"
+    - "Reboot"
+  block:
+    - name: Ensure GRUB2 reads input from the console and serial port
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_TERMINAL_INPUT='
+        line: 'GRUB_TERMINAL_INPUT="console serial"'
+
+    - name: Ensure GRUB2 writes output to the console and serial port
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_TERMINAL_OUTPUT='
+        line: 'GRUB_TERMINAL_OUTPUT="console serial"'
+
+    - name: Ensure GRUB2 serial port is configured
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_SERIAL_COMMAND='
+        line: 'GRUB_SERIAL_COMMAND="serial --unit=0 --speed=115200"'
+
+- name: Ensure the kernel uses the serial console
+  block:
+    - name: Read kernel arguments of every boot entry
+      ansible.builtin.command:
+        cmd: grubby --info=ALL
+      register: serial_console_grubby_info
+      changed_when: false
+
+    # grubby also appends the arguments to GRUB_CMDLINE_LINUX.
+    # Pass them as one string, or only console=tty0 is added.
+    - name: Ensure kernel console arguments are present
+      ansible.builtin.command:
+        cmd: grubby --update-kernel=ALL --args="console=tty0 console=ttyS0,115200"
+      when: >-
+        serial_console_grubby_info.stdout_lines
+        | select('match', '^args=')
+        | reject('search', 'console=tty0 console=ttyS0,115200')
+        | list | length > 0
+      changed_when: true
+      notify:
+        - "Reboot"
+
+- name: Ensure repair shells fill a 120x24 serial console
+  block:
+    - name: Ensure repair shell drop-in directories exist
+      ansible.builtin.file:
+        path: /etc/systemd/system/{{ item }}.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: '755'
+      loop:
+        - emergency
+        - rescue
+
+    - name: Ensure repair shell drop-ins are installed
+      ansible.builtin.copy:
+        src: serial-size.conf
+        dest: /etc/systemd/system/{{ item }}.service.d/serial-size.conf
+        owner: root
+        group: root
+        mode: '644'
+      loop:
+        - emergency
+        - rescue
+      notify:
+        - "Reload systemd"
